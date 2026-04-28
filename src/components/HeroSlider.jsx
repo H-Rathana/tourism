@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useEffect } from "react";
-import slide1 from "../assets/images/Angkorwat.jpg"
-import slide2 from "../assets/images/Borkor.jpg"
+import slide1 from "../assets/images/Angkorwat2.jpg"
+import slide2 from "../assets/images/BokorMountain.jpg"
 import slide3 from "../assets/images/KohRong.jpg"
 import slide4 from "../assets/images/mondulkiri.jpg"
 
@@ -21,7 +21,7 @@ const HeroSlider = () => {
   }, []);
 
   return (
-    <div className="relative w-full h-[30vh] md:h-[50vh] overflow-hidden">
+    <div className="relative w-full h-[30vh] md:h-[60vh] overflow-hidden">
       
       {/* Image */}
       <img
@@ -33,11 +33,13 @@ const HeroSlider = () => {
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40 flex flex-col justify-center px-6 md:px-16 text-white">
         
-        <h1 className="text-2xl md:text-5xl font-bold mb-4">
-          Find your dream trip
+        <h1 className="text-2xl md:text-5xl font-bold mb-3 font-serif">
+          Find your dream trip 
         </h1>
-
-        <p className="text-sm md:text-xl mb-6">
+        <h1 className="text-2xl md:text-5xl font-bold mb-5 font-serif">
+          On WonderEscape
+        </h1>
+        <p className="text-sm md:text-xl mb-6 font-sans">
           We offer unbeatable price & excellent service
         </p>
 
