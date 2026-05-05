@@ -1,6 +1,8 @@
 import { BASE_URL } from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 const TourCard = ({ tour }) => {
+  const navigate = useNavigate();
   return (
     <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition duration-300">
       
@@ -8,6 +10,7 @@ const TourCard = ({ tour }) => {
       <div className="relative">
         
         <img
+          onClick={() => navigate(`/tours/${tour.tour_id}`)}
           src={`${BASE_URL}/uploads/${tour.image}`}
           alt={tour.title}
           className="w-full h-52 object-cover "
@@ -32,7 +35,7 @@ const TourCard = ({ tour }) => {
         {/* Location + Rating */}
         <div className="flex justify-between items-center mt-3 text-sm text-gray-500">
           <span>📍 {tour.location}</span>
-          <span>⭐ {tour.rating}</span>
+          <span>⌛ {tour.duration}</span>
         </div>
 
         {/* Title */}
@@ -54,7 +57,9 @@ const TourCard = ({ tour }) => {
             </p>
           </div>
 
-          <button className="bg-orange-500 text-white px-4 py-2 rounded-full hover:bg-orange-600 transition">
+          <button
+          onClick={() => navigate(`/tours/${tour.tour_id}`)}
+  className="bg-orange-500 text-white px-4 py-2 rounded-full">
             Book Now
           </button>
         </div>

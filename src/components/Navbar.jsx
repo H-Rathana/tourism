@@ -11,11 +11,11 @@ const Navbar = () => {
 
       {/* Desktop Menu */}
       <div className="hidden md:flex gap-6">
-        <Link to="/">Home</Link>
-        <Link to="/tours">Tour</Link>
-        <Link to="/destination">Destination</Link>
-        <Link to="/package">Package</Link>
-        <Link to="/about">About</Link>
+        <Link to="/" className=" hover:text-sky-400">Home</Link>
+        <Link to="/tours" className=" hover:text-sky-400">Tour</Link>
+        <Link to="/destination" className=" hover:text-sky-400">Destination</Link>
+        <Link to="/package" className=" hover:text-sky-400">Package</Link>
+        <Link to="/about"className=" hover:text-sky-300">About</Link>
       </div>
 
       {/* Mobile Button */}
