@@ -4,6 +4,10 @@ import { BASE_URL } from "../services/api";
 import TourDetailsSkeleton from "../components/TourDetailsSkeleton";
 import { FaChevronLeft } from 'react-icons/fa';
 import BookingForm from "../components/BookingForm";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+
+
 
 
 
@@ -13,7 +17,7 @@ const TourDetails = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-
+  const { user } = useContext(AuthContext);
   useEffect(() => {
   fetch(`${BASE_URL}/api/tours/${id}`)
     .then((res) => res.json())
@@ -87,7 +91,14 @@ const TourDetails = () => {
               ${tour.price}
             </h2>
 
-            <button onClick={() => setShowModal(true)}
+            <button 
+             onClick={() => {
+                if (!user) {
+                  navigate("/login");
+                } else {
+                  setShowModal(true);
+                }
+              }}
             className="w-full mt-6 bg-orange-500 text-white py-3 rounded-full hover:bg-orange-600 transition">
               Book Now
             </button>

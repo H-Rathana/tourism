@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useEffect } from "react";
-import slide1 from "../assets/images/Angkorwat2.jpg"
-import slide2 from "../assets/images/BokorMountain.jpg"
-import slide3 from "../assets/images/KohRong.jpg"
-import slide4 from "../assets/images/mondulkiri.jpg"
+import slide1 from "../assets/images/island.jpg"
+import slide2 from "../assets/images/Mondulkiri2.jpg"
+import slide3 from "../assets/images/AngkorToch.jpg"
+import slide4 from "../assets/images/Boat.png"
 
 const images = [slide1, slide2, slide3,slide4];
 
@@ -31,7 +31,7 @@ const HeroSlider = () => {
       />
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40 flex flex-col justify-center px-6 md:px-16 text-white">
+      <div className="absolute inset-0  flex flex-col justify-center px-6 md:px-16 text-white">
         
         <h1 className="text-2xl md:text-5xl font-bold mb-3 font-serif">
           Find your dream trip 

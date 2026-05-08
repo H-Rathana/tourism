@@ -173,7 +173,7 @@ const handleSubmit = (e) => {
           </div>
 
           {/* Price Box */}
-          <div className="md:col-span-2 bg-gray-100 p-4 rounded-xl mt-2">
+          <div className="md:col-span-2 bg-gray-100 p-4 rounded-xl mt-2 ">
             <div className="flex justify-between text-sm">
               <span>Price per person</span>
               <span>${tour.price}</span>
@@ -204,7 +204,7 @@ const handleSubmit = (e) => {
 
                 <button
                     type="submit"
-                    className="w-full md:w-auto px-6 py-3 rounded-full bg-orange-500 text-white hover:bg-orange-600"
+                    className="w-full md:w-auto px-6 py-3 rounded-full bg-sky-500 text-white hover:bg-sky-600"
                 >
                     Confirm Booking →
                 </button>
