@@ -12,7 +12,7 @@ const TourList = ({ tours }) => {
       </p>
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2  lg:grid-cols-4">
         {tours.map((tour) => (
-          <TourCard key={tour.id} tour={tour} />
+          <TourCard tour={tour} key={tour.tour_id}/>
         ))}
       </div>
     </div>

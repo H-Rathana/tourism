@@ -1,49 +1,71 @@
 import { useState } from "react";
-import { BASE_URL } from "../services/api";
-
+import API, { BASE_URL } from "../services/api";
+import PaymentModal from "../components/PaymentModal";
 
 
 const BookingForm = ({ tour, onClose }) => {
+ 
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    date: "",
-    travelers: 1,
-    requests: "",
-  });
-  const [errors, setErrors] = useState({});
+  full_name: "",
+  email: "",
+  phone: "",
+  travel_date: "",
+  people_count: 1,
+  special_requests: "",
+});
+const [showQR, setShowQR] = useState(false);
+const [qrCode, setQrCode] = useState("");
+
+const [errors, setErrors] = useState({});
  const validate = () => {
   let newErrors = {};
 
-  if (!form.name.trim()) {
-    newErrors.name = "Full name is required";
+  if (!form.full_name.trim()) {
+    newErrors.full_name = "Full name is required";
   }
 
   if (!form.email.trim()) {
     newErrors.email = "Email is required";
   }
 
-  if (!form.date) {
-    newErrors.date = "Tour date is required";
+  if (!form.travel_date) {
+    newErrors.travel_date = "Tour date is required";
   }
 
   setErrors(newErrors);
 
   return Object.keys(newErrors).length === 0;
 };
-const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
 
   const isValid = validate();
 
-  console.log("Validation result:", isValid); // DEBUG
-
   if (!isValid) return;
 
-  console.log("Form Submitted:", form);
+  try {
+
+    const bookingData = {
+      ...form,
+      tour_id: tour.tour_id,
+      total_price: tour.price * form.people_count,
+    };
+
+    const res = await API.post(
+      "/bookings",
+      bookingData
+    );
+
+    // show qr modal
+    setQrCode(res.data.qrCode);
+
+    setShowQR(true);
+
+  } catch (error) {
+    console.error(error);
+  }
 };
-  const price = tour.price * form.travelers;
+  const price = tour.price * form.people_count;
 
   const handleChange = (e) => {
     setForm({
@@ -51,7 +73,7 @@ const handleSubmit = (e) => {
       [e.target.name]: e.target.value,
     });
   };
-
+  
 
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 px-4">
@@ -76,13 +98,6 @@ const handleSubmit = (e) => {
             </span>
           </div>
 
-          {/* Close
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 bg-white/20 p-2 rounded-full text-white hover:bg-red-400"
-          >
-             <IoMdClose size={24} color="white" />
-          </button> */}
         </div>
 
         {/* Form */}
@@ -91,18 +106,20 @@ const handleSubmit = (e) => {
             onSubmit={handleSubmit}
             className="grid md:grid-cols-2 gap-4">
                 <div>
+                
             <label>Full Name *</label>
+          
            <input
-                name="name"
-                value={form.name}
+                name="full_name"
+                value={form.full_name}
                 onChange={handleChange}
                 className={`w-full border rounded-lg p-3 mt-1 ${
-                    errors.name ? "border-red-500" : ""
+                    errors.full_name ? "border-red-500" : ""
                 }`}
                 placeholder="Your name"
             />
-            {errors.name && (
-                 <p className="text-red-500 text-sm">{errors.name}</p>
+            {errors.full_name && (
+                 <p className="text-red-500 text-sm">{errors.full_name}</p>
             )}
           </div>
 
@@ -137,27 +154,30 @@ const handleSubmit = (e) => {
             <label>Tour Date *</label>
             <input
                 type="date"
-                name="date"
-                value={form.date}
+                name="travel_date"
+                value={form.travel_date}
                 onChange={handleChange}
                 className={`w-full border rounded-lg p-3 mt-1 ${
-                    errors.date ? "border-red-500" : ""
+                    errors.travel_date ? "border-red-500" : ""
                 }`}
             />
-            {errors.date && (
-                <p className="text-red-500 text-sm">{errors.date}</p>
+            {errors.travel_date && (
+                <p className="text-red-500 text-sm">{errors.travel_date}</p>
             )}
           </div>
 
           <div>
             <label>Travelers</label>
             <select
-              name="travelers"
+              name="people_count"
+              value={form.people_count}
               onChange={handleChange}
               className="w-full border rounded-lg p-3 mt-1"
             >
               {[1,2,3,4,5].map(n => (
-                <option key={n}>{n}</option>
+                <option key={n} value={n}>
+                  {n}
+                </option>
               ))}
             </select>
           </div>
@@ -165,7 +185,8 @@ const handleSubmit = (e) => {
           <div className="md:col-span-2">
             <label>Special Requests</label>
             <textarea
-              name="requests"
+              name="special_requests"
+              value={form.special_requests}
               onChange={handleChange}
               className="w-full border rounded-lg p-3 mt-1"
               placeholder="Dietary needs, accessibility..."
@@ -181,7 +202,7 @@ const handleSubmit = (e) => {
 
             <div className="flex justify-between text-sm mt-1">
               <span>Travelers</span>
-              <span>x {form.travelers}</span>
+              <span>x {form.people_count}</span>
             </div>
 
             <hr className="my-2"/>
@@ -201,7 +222,7 @@ const handleSubmit = (e) => {
                 >
                     Cancel
                 </button>
-
+                
                 <button
                     type="submit"
                     className="w-full md:w-auto px-6 py-3 rounded-full bg-sky-500 text-white hover:bg-sky-600"
@@ -213,6 +234,12 @@ const handleSubmit = (e) => {
         </div>
             
         </div>
+        {showQR && (
+                  <PaymentModal
+                    qrCode={qrCode}
+                    onClose={() => setShowQR(false)}
+                  />
+                )}
     </div>
   );
 };

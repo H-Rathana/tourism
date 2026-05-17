@@ -5,6 +5,7 @@ import TourDetails from "../pages/ToursDetails";
 import Tours from "../pages/Tours";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import Profile from "../pages/Profile";
 const AppRoutes = () => {
   return (
     <BrowserRouter>
@@ -15,6 +16,7 @@ const AppRoutes = () => {
           <Route path="/tours/:id" element={<TourDetails />} />
           <Route path="/login" element={<Login/>} />
           <Route path="/register" element={<Register/>} />
+          <Route path="/profile" element={<Profile/>} />
         </Routes>
       </MainLayout>
     </BrowserRouter>

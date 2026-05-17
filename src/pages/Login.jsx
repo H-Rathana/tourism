@@ -31,13 +31,21 @@ const Login = () => {
       return;
     }
 
-    login(data);
-    navigate("/");
+    localStorage.setItem("token", data.token);
+
+localStorage.setItem(
+  "user",
+  JSON.stringify(data.user)
+);
+
+login(data);
+
+navigate("/");
   };
 
   return (
    <div
-      className="min-h-screen flex items-center justify-center bg-cover bg-center"
+      className=" min-h-screen flex items-center justify-center bg-cover bg-center"
       style={{
         backgroundImage:
           "url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee')",
