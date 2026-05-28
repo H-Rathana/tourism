@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { BASE_URL } from "../services/api";
+import API, { BASE_URL } from "../services/api";
 import TourDetailsSkeleton from "../components/TourDetailsSkeleton";
 import { FaChevronLeft } from 'react-icons/fa';
 import BookingForm from "../components/BookingForm";
@@ -19,12 +19,15 @@ const TourDetails = () => {
   const [showModal, setShowModal] = useState(false);
   const { user } = useContext(AuthContext);
   useEffect(() => {
-  fetch(`${BASE_URL}/api/tours/${id}`)
-    .then((res) => res.json())
-    .then((data) => {
-      setTour(data);
-      setTimeout(() => setLoading(false), 500);
-    });
+
+  API.get(`/tours/${id}`)
+  .then((res) => {
+    setTour(res.data);
+    setTimeout(() => setLoading(false), 500);
+  })
+  .catch((err) => {
+    console.error(err);
+  });
     
 }, [id]);
   useEffect(() => {
