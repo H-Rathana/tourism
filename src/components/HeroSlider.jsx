@@ -1,68 +1,294 @@
-import { useState } from "react";
-import { useEffect } from "react";
-import slide1 from "../assets/images/island.jpg"
-import slide2 from "../assets/images/Mondulkiri2.jpg"
-import slide3 from "../assets/images/AngkorToch.jpg"
-import slide4 from "../assets/images/Boat.png"
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  ChevronLeft,
+  ChevronRight,
+  MapPin,
+} from "lucide-react";
 
-const images = [slide1, slide2, slide3,slide4];
+import slide1 from "../assets/images/island.jpg";
+import slide2 from "../assets/images/Mondulkiri2.jpg";
+import slide3 from "../assets/images/AngkorToch.jpg";
+import slide4 from "../assets/images/Boat.png";
+
+const slides = [
+  {
+    image: slide1,
+    title: "Discover Cambodia's Hidden Wonders",
+    subtitle:
+      "Explore breathtaking islands and unforgettable adventures.",
+  },
+  {
+    image: slide2,
+    title: "Experience The Beauty Of Mondulkiri",
+    subtitle:
+      "Escape into nature, waterfalls, and fresh mountain air.",
+  },
+  {
+    image: slide3,
+    title: "Explore Ancient Angkor Wat",
+    subtitle:
+      "Discover Cambodia's rich culture and heritage.",
+  },
+  {
+    image: slide4,
+    title: "Relax With Natural",
+    subtitle:
+      "Enjoy peaceful forest and local experiences.",
+  },
+];
 
 const HeroSlider = () => {
   const [current, setCurrent] = useState(0);
+  const navigate = useNavigate();
 
   const nextSlide = () => {
-    setCurrent((prev) => (prev + 1) % images.length);
+    setCurrent((prev) =>
+      (prev + 1) % slides.length
+    );
   };
 
-  // Auto slide
+  const prevSlide = () => {
+    setCurrent((prev) =>
+      prev === 0
+        ? slides.length - 1
+        : prev - 1
+    );
+  };
+
   useEffect(() => {
-    const interval = setInterval(nextSlide, 15000);
+    const interval = setInterval(
+      nextSlide,
+      8000
+    );
+
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="relative w-full h-[30vh] md:h-[60vh] overflow-hidden">
-      
-      {/* Image */}
+    <section
+      className="
+      relative
+      h-[60vh]
+      md:h-[85vh]
+      overflow-hidden
+      "
+    >
+      {/* Background Image */}
       <img
-        src={images[current]}
+        src={slides[current].image}
         alt="slide"
-        className="w-full h-full object-cover transition duration-700"
+        className="
+        absolute
+        inset-0
+        w-full
+        h-full
+        object-cover
+        transition-all
+        duration-700
+        "
       />
 
       {/* Overlay */}
-      <div className="absolute inset-0  flex flex-col justify-center px-6 md:px-16 text-white">
-        
-        <h1 className="text-2xl md:text-5xl font-bold mb-3 font-serif">
-          Find your dream trip 
-        </h1>
-        <h1 className="text-2xl md:text-5xl font-bold mb-5 font-serif">
-          On WonderEscape
-        </h1>
-        <p className="text-sm md:text-xl mb-6 font-sans">
-          We offer unbeatable price & excellent service
-        </p>
+      <div className="absolute inset-0 bg-black/45" />
 
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
-          <button className="bg-white text-black px-6 py-2 rounded-full">
-            Book now
-          </button>
-          <span className="text-sm md:text-lg">+855 889351504</span>
+      {/* Content */}
+      <div
+        className="
+        relative
+        z-10
+        h-full
+        max-w-7xl
+        mx-auto
+        px-6
+        flex
+        items-center
+        "
+      >
+        <div className="max-w-3xl text-white">
+
+          <div className="flex items-center gap-2 mb-4">
+            <MapPin size={18} />
+            <span className="uppercase tracking-widest text-sm">
+              Cambodia Tourism
+            </span>
+          </div>
+
+          <h1
+            className="
+            text-4xl
+            md:text-6xl
+            font-bold
+            leading-tight
+            mb-6
+            "
+          >
+            {slides[current].title}
+          </h1>
+
+          <p
+            className="
+            text-lg
+            md:text-xl
+            text-slate-200
+            mb-8
+            "
+          >
+            {slides[current].subtitle}
+          </p>
+
+          {/* Buttons */}
+          <div className="flex flex-wrap gap-4">
+
+            <button
+              onClick={() =>
+                navigate("/tours")
+              }
+              className="
+              bg-orange-500
+              hover:bg-orange-600
+              px-8
+              py-3
+              rounded-xl
+              font-semibold
+              transition
+              "
+            >
+              Explore Tours
+            </button>
+
+            <button
+              onClick={() =>
+                navigate("/about")
+              }
+              className="
+              border
+              border-white
+              hover:bg-white
+              hover:text-black
+              px-8
+              py-3
+              rounded-xl
+              font-semibold
+              transition
+              "
+            >
+              Learn More
+            </button>
+
+          </div>
+
+          {/* Stats */}
+          <div
+            className="
+            flex
+            gap-10
+            mt-12
+            flex-wrap
+            "
+          >
+            <div>
+              <h3 className="text-3xl font-bold">
+                500+
+              </h3>
+              <p className="text-slate-300">
+                Bookings
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-3xl font-bold">
+                25+
+              </h3>
+              <p className="text-slate-300">
+                Destinations
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-3xl font-bold">
+                98%
+              </h3>
+              <p className="text-slate-300">
+                Happy Travelers
+              </p>
+            </div>
+          </div>
+
         </div>
       </div>
+
+      {/* Previous */}
+      <button
+        onClick={prevSlide}
+        className="
+        absolute
+        left-4
+        top-1/2
+        -translate-y-1/2
+        bg-white/20
+        backdrop-blur-md
+        p-3
+        rounded-full
+        text-white
+        hover:bg-white/30
+        "
+      >
+        <ChevronLeft size={24} />
+      </button>
+
+      {/* Next */}
+      <button
+        onClick={nextSlide}
+        className="
+        absolute
+        right-4
+        top-1/2
+        -translate-y-1/2
+        bg-white/20
+        backdrop-blur-md
+        p-3
+        rounded-full
+        text-white
+        hover:bg-white/30
+        "
+      >
+        <ChevronRight size={24} />
+      </button>
+
       {/* Dots */}
-      <div className="absolute bottom-5 w-full flex justify-center gap-2">
-        {images.map((_, i) => (
-          <div
+      <div
+        className="
+        absolute
+        bottom-8
+        left-1/2
+        -translate-x-1/2
+        flex
+        gap-3
+        "
+      >
+        {slides.map((_, i) => (
+          <button
             key={i}
-            onClick={() => setCurrent(i)}
-            className={`w-3 h-3 rounded-full cursor-pointer ${
-              i === current ? "bg-white" : "bg-gray-400"
-            }`}
+            onClick={() =>
+              setCurrent(i)
+            }
+            className={`
+            w-3
+            h-3
+            rounded-full
+            transition
+
+            ${
+              i === current
+                ? "bg-white w-8"
+                : "bg-white/50"
+            }
+            `}
           />
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

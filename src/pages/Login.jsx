@@ -40,7 +40,7 @@ localStorage.setItem(
 
 login(data);
 
-navigate("/");
+window.location.href = "/";
   };
 
   return (

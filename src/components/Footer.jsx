@@ -3,7 +3,7 @@ import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-gray-300 mt-20 border-t border-transparent bg-gradient-to-r from-teal-500 via-blue-500 to-purple-500 bg-[length:100%_2px] bg-no-repeat">
+    <footer className="bg-gray-900 text-gray-300  border-t border-transparent bg-gradient-to-r from-teal-500 via-blue-500 to-purple-500 bg-[length:100%_2px] bg-no-repeat">
       
       <div className="max-w-7xl mx-auto px-6 py-12 grid gap-10 md:grid-cols-4">
         
@@ -11,7 +11,7 @@ const Footer = () => {
         <div>
           <h2 className="text-2xl font-bold text-white">🌴 WanderEscape</h2>
           <p className="mt-4 text-sm text-gray-400">
-            Discover amazing destinations and book unforgettable travel experiences with ease.
+            Discover amazing destinations and book unforgettable travel experiences with us.
           </p>
         </div>
 

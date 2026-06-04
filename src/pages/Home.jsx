@@ -1,23 +1,26 @@
 import HeroSlider from "../components/HeroSlider";
-import { useEffect, useState } from "react";
 import TourList from "../components/TourList";
+import PopularDestinations from "../components/Home/PopularDestinations";
+import FeaturedTours from "../components/Home/FeaturedTours";
+import WhyChooseUs from "../components/Home/WhyChooseUs";
+import CtaSection from "../components/Home/CTASection";
+
+
+
+
 
 
 const Home = () => {
-   const [ setTours] = useState([]);
-
-  useEffect(() => {
-    fetch("http://localhost:5000/api/tours")
-      .then((res) => res.json())
-      .then((data) => setTours(data))
-      .catch((err) => console.log(err));
-  },);
+   
 
   return (
     <div>
       <HeroSlider/>
-         
-      
+      <PopularDestinations/> 
+      <FeaturedTours/>
+      <WhyChooseUs/>
+      <CtaSection/>
+
     </div>
   );
 };
