@@ -163,7 +163,7 @@ const TourCard = ({ tour }) => {
 
               <DollarSign
                 size={20}
-                className="text-emerald-500"
+                className="text-emerald-600"
               />
 
               <span

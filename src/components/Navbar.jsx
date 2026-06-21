@@ -10,6 +10,7 @@ import {
   Package,
   Home,
   Info,
+  Phone,
   ClipboardList,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -22,13 +23,20 @@ const Navbar = () => {
 
   const [notifications, setNotifications] =
   useState([]);
+ const [wishlistCount, setWishlistCount] =
+  useState(0);
 
 const navigate = useNavigate();
 
 
-const user = JSON.parse(
-  localStorage.getItem("user") || "{}"
-);
+const [user, setUser] =
+  useState(
+    JSON.parse(
+      localStorage.getItem("user")
+    ) || {}
+  );
+
+
 
 const handleLogout = () => {
 
@@ -194,6 +202,137 @@ const handleNotificationClick =
     }
 
 };
+useEffect(() => {
+
+  const fetchWishlist =
+    async () => {
+
+      try {
+
+        const token =
+          localStorage.getItem(
+            "token"
+          );
+
+        if (!token) return;
+
+        const res =
+          await fetch(
+            "http://localhost:5000/api/wishlist",
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+        const data =
+          await res.json();
+
+        setWishlistCount(
+          data.length
+        );
+
+      } catch(error){
+
+        console.log(error);
+
+      }
+
+    };
+
+  fetchWishlist();
+
+}, []);
+useEffect(() => {
+
+  const refreshWishlist =
+    async () => {
+
+      const token =
+        localStorage.getItem(
+          "token"
+        );
+
+      if (!token) return;
+
+      const res =
+        await fetch(
+          "http://localhost:5000/api/wishlist",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+        );
+
+      const data =
+        await res.json();
+
+      setWishlistCount(
+        data.length
+      );
+
+    };
+
+  window.addEventListener(
+    "wishlistUpdated",
+    refreshWishlist
+  );
+
+  return () => {
+
+    window.removeEventListener(
+      "wishlistUpdated",
+      refreshWishlist
+    );
+
+  };
+
+}, []);
+useEffect(() => {
+
+  const fetchProfile =
+    async () => {
+
+      try {
+
+        const token =
+          localStorage.getItem(
+            "token"
+          );
+
+        if (!token) return;
+
+        const res =
+          await fetch(
+            "http://localhost:5000/api/users/profile",
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+        const data =
+          await res.json();
+
+        setUser(data);
+
+      } catch(error){
+
+        console.log(error);
+
+      }
+
+    };
+
+  fetchProfile();
+
+}, []);
   return (
     <header
       className="
@@ -273,7 +412,7 @@ const handleNotificationClick =
             </NavLink>
 
             <NavLink
-              to="/packages"
+              to="/travel-guides"
               className={({ isActive }) =>
                 `flex items-center gap-2 transition
                 ${
@@ -284,7 +423,7 @@ const handleNotificationClick =
               }
             >
               <Package size={18} />
-              Packages
+              Travel Guides
             </NavLink>
 
             <NavLink
@@ -303,7 +442,7 @@ const handleNotificationClick =
             </NavLink>
 
             <NavLink
-              to="/about"
+              to="/about-us"
               className={({ isActive }) =>
                 `flex items-center gap-2 transition
                 ${
@@ -314,7 +453,21 @@ const handleNotificationClick =
               }
             >
               <Info size={18} />
-              About
+              About Us
+            </NavLink>
+            <NavLink
+              to="/contact-us"
+              className={({ isActive }) =>
+                `flex items-center gap-2 transition
+                ${
+                  isActive
+                    ? "text-sky-600"
+                    : "text-slate-700 hover:text-sky-600"
+                }`
+              }
+            >
+              <Phone size={18} />
+              Contact Us
             </NavLink>
 
           </nav>
@@ -323,9 +476,43 @@ const handleNotificationClick =
           <div className="hidden lg:flex items-center gap-5">
 
             {/* Wishlist */}
-            <button className="hover:text-red-500 transition">
-              <Heart size={22} />
-            </button>
+             <button
+                onClick={() =>
+                  navigate("/wishlist")
+                }
+                className="
+                hover:text-red-500
+                transition
+                relative
+                "
+              >
+
+                <Heart size={22} />
+
+                {wishlistCount > 0 && (
+
+                  <span
+                    className="
+                    absolute
+                    -top-2
+                    -right-2
+                    bg-red-500
+                    text-white
+                    text-xs
+                    w-5
+                    h-5
+                    rounded-full
+                    flex
+                    items-center
+                    justify-center
+                    "
+                  >
+                    {wishlistCount}
+                  </span>
+
+                )}
+
+              </button>
 
             {/* Notifications */}
             <div className="relative">
@@ -506,7 +693,24 @@ const handleNotificationClick =
                   justify-center
                   "
                 >
-                  <User size={20} />
+                  {user?.profile_image ? (
+
+                <img
+                  src={`http://localhost:5000/uploads/profiles/${user.profile_image}`}
+                  alt=""
+                  className="
+                  w-full
+                  h-full
+                  rounded-full
+                  object-cover
+                  "
+                />
+
+              ) : (
+
+                <User size={20} />
+
+              )}
                 </div>
               </button>
 
@@ -553,7 +757,24 @@ const handleNotificationClick =
       font-bold
       "
     >
-      {user?.name?.charAt(0)}
+      {user?.profile_image ? (
+
+  <img
+    src={`http://localhost:5000/uploads/profiles/${user.profile_image}`}
+    alt=""
+    className="
+    w-full
+    h-full
+    rounded-full
+    object-cover
+    "
+  />
+
+) : (
+
+  user?.name?.charAt(0)
+
+)}
     </div>
 
     <h3 className="mt-3 font-bold text-lg">
@@ -660,14 +881,17 @@ const handleNotificationClick =
             <Link to="/tours">
               Tours
             </Link>
-            <Link to="/packages">
-              Packages
+            <Link to="/travel-guides">
+              Travel Guides
             </Link>
             <Link to="/my-bookings">
               My Bookings
             </Link>
-            <Link to="/about">
-              About
+            <Link to="/about-us">
+              About us
+            </Link>
+            <Link to="/contact-us">
+              Contact us
             </Link>
            <div className="relative">
 

@@ -1,4 +1,12 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState
+} from "react";
+
+import {
+  useSearchParams
+} from "react-router-dom";
+
 import {
   Search,
   MapPin,
@@ -6,7 +14,6 @@ import {
   Star,
   Plane,
 } from "lucide-react";
-
 import TourList from "../components/TourList";
 
 const Tours = () => {
@@ -14,6 +21,14 @@ const Tours = () => {
   const [tours, setTours] = useState([]);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("default");
+
+  const [searchParams] =
+  useSearchParams();
+
+  const locationFilter =
+  searchParams.get(
+    "location"
+  );
 
   useEffect(() => {
     fetch("http://localhost:5000/api/tours")
@@ -23,11 +38,38 @@ const Tours = () => {
   }, []);
 
   // Search
-  let filteredTours = tours.filter((tour) =>
-    tour.title
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+ let filteredTours =
+  tours.filter((tour) => {
+
+    const matchSearch =
+
+      tour.title
+        .toLowerCase()
+        .includes(
+          search.toLowerCase()
+        )
+
+      ||
+
+      tour.location
+        .toLowerCase()
+        .includes(
+          search.toLowerCase()
+        );
+
+    const matchLocation =
+
+      !locationFilter ||
+
+      tour.location ===
+      locationFilter;
+
+    return (
+      matchSearch &&
+      matchLocation
+    );
+
+  });
 
   // Sort
   if (sort === "low-high") {
@@ -291,36 +333,30 @@ const Tours = () => {
 
         </div>
 
-        {/* CATEGORY FILTERS */}
-        <div
-          className="
-          flex
-          gap-3
-          flex-wrap
-          mb-10
-          "
-        >
-          <button className="px-5 py-2 rounded-full bg-sky-500 text-white">
-            All
-          </button>
+            {
+              locationFilter && (
 
-          <button className="px-5 py-2 rounded-full bg-white border">
-            Beach
-          </button>
+                <div
+                  className="
+                  mb-6
+                  bg-orange-100
+                  text-orange-700
+                  px-5
+                  py-3
+                  rounded-2xl
+                  "
+                >
 
-          <button className="px-5 py-2 rounded-full bg-white border">
-            Adventure
-          </button>
+                  Showing tours in:
+                  <strong>
+                    {" "}
+                    {locationFilter}
+                  </strong>
 
-          <button className="px-5 py-2 rounded-full bg-white border">
-            Culture
-          </button>
+                </div>
 
-          <button className="px-5 py-2 rounded-full bg-white border">
-            Nature
-          </button>
-        </div>
-
+              )
+            }
         {/* TOUR LIST */}
         {filteredTours.length > 0 ? (
 
