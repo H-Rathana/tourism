@@ -398,7 +398,7 @@ const MyBookings = () => {
 
               )}
 
-              {booking.status ===
+              {/* {booking.status ===
                 "Pending" && (
 
                 <button
@@ -414,7 +414,7 @@ const MyBookings = () => {
                   Cancel Booking
                 </button>
 
-              )}
+              )} */}
 
             </div>
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import API, { BASE_URL } from "../services/api";
 import PaymentModal from "../components/PaymentModal";
+import toast from "react-hot-toast";
 
 const BookingForm = ({ tour, onClose }) => {
 
@@ -10,11 +11,16 @@ const BookingForm = ({ tour, onClose }) => {
   const [showPayment, setShowPayment] =
     useState(false);
 
-  const [bookingId, setBookingId] =
+  const [bookingId] =
     useState(null);
 
   const [errors, setErrors] =
     useState({});
+  const [showSuccess,setShowSuccess] =useState(false);
+  const [setCreatedBooking] =useState(null);
+
+  const [pendingBooking, setPendingBooking] =useState(null);
+
 
   const [form, setForm] = useState({
     full_name: "",
@@ -59,6 +65,10 @@ const BookingForm = ({ tour, onClose }) => {
       newErrors.email =
         "Email is required";
     }
+    if (!form.phone.trim()) {
+      newErrors.phone =
+        "Phone Number is required";
+    }
 
     if (!form.travel_date) {
       newErrors.travel_date =
@@ -74,99 +84,177 @@ const BookingForm = ({ tour, onClose }) => {
   };
 
   // ✅ CREATE BOOKING
-  const handleSubmit =
-    async (e) => {
+  // const handleSubmit =
+  //   async (e) => {
 
-      e.preventDefault();
+  //     e.preventDefault();
 
-      if (!validate()) return;
+  //     if (!validate()) return;
 
-      try {
+  //     try {
 
-        setLoading(true);
+  //       setLoading(true);
 
-        const bookingData = {
+  //       const bookingData = {
 
-          ...form,
+  //         ...form,
 
-          tour_id:
-            tour.tour_id,
+  //         tour_id:
+  //           tour.tour_id,
 
-          total_price:
-            totalPrice,
+  //         total_price:
+  //           totalPrice,
 
-        };
+  //       };
 
-        const res =
-          await API.post(
-            "/bookings",
-            bookingData
-          );
+  //       const res =
+  //         await API.post(
+  //           "/bookings",
+  //           bookingData
+  //         );
 
-        console.log(
-          "BOOKING RESPONSE:",
-          res.data
-        );
+  //       console.log(
+  //         "BOOKING RESPONSE:",
+  //         res.data
+  //       );
 
-        const booking =
-          res.data.booking;
+  //       const booking =
+  //         res.data.booking;
 
-        // ✅ EXISTING BOOKING
-        if (res.data.existing) {
+  //       // ✅ EXISTING BOOKING
+  //       if (res.data.existing) {
 
-          alert(
-            "You already have a pending booking for this tour."
-          );
+  //         toast (
+  //           "You already have a pending booking for this tour."
+  //         );
 
-        }
+  //       }
 
-        // ✅ SAVE BOOKING ID
-        setBookingId(
-          booking.booking_id
-        );
+  //       // ✅ SAVE BOOKING ID
+  //       setBookingId(
+  //         booking.booking_id
+  //       );
 
-        // ✅ OPEN PAYMENT MODAL
-        setShowPayment(true);
+  //       // ✅ OPEN PAYMENT MODAL
+  //       setShowPayment(true);
 
-      } catch (error) {
+  //     } catch (error) {
 
-        console.error(error);
+  //       console.error(error);
 
-        alert(
-          error.response?.data?.message ||
-          "Booking failed"
-        );
+  //       alert(
+  //         error.response?.data?.message ||
+  //         "Booking failed"
+  //       );
 
-      } finally {
+  //     } finally {
 
-        setLoading(false);
+  //       setLoading(false);
 
-      }
+  //     }
 
-    };
+  //   };
+  const handleSubmit = async (e) => {
+
+  e.preventDefault();
+
+  if (!validate()) return;
+
+  const bookingData = {
+
+    ...form,
+
+    tour_id: tour.tour_id,
+
+    total_price: totalPrice,
+
+  };
+
+  setPendingBooking(
+    bookingData
+  );
+
+  setShowPayment(true);
+
+};
 
   // ✅ USER CLICKED PAID
+  // const handlePaid =
+  //   async () => {
+
+  //     try {
+
+  //       toast.success(
+  //         "Payment submitted successfully"
+  //       );
+  //       toast.success(
+  //         "We are processing your ticket.It will arrive in your notification soon"
+  //       );
+
+  //       setShowPayment(false);
+
+  //       onClose();
+
+  //     } catch (error) {
+
+  //       console.error(error);
+
+  //     }
+
+  //   };
   const handlePaid =
-    async () => {
+  async () => {
 
-      try {
+    try {
 
-        alert(
-          "Payment submitted successfully"
+      setLoading(true);
+
+      const res =
+        await API.post(
+          "/bookings",
+          pendingBooking
         );
 
-        setShowPayment(false);
+      console.log(
+        "BOOKING CREATED:",
+        res.data
+      );
 
-        onClose();
+      toast.success(
+        "Booking submitted successfully"
+      );
 
-      } catch (error) {
+      toast.success(
+        "We are processing your ticket. It will arrive in your notifications soon."
+      );
 
-        console.error(error);
+      const booking =
+      res.data.booking;
 
-      }
+    setCreatedBooking(
+      booking
+    );
 
-    };
+    setShowPayment(false);
 
+    setShowSuccess(true);
+
+    } catch(error){
+
+      console.error(error);
+
+      toast.error(
+        error.response?.data?.message ||
+        "Booking failed"
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+};
   return (
 
     <div className="fixed inset-0 z-50 bg-black/60 flex justify-center items-center p-4">
@@ -335,7 +423,142 @@ const BookingForm = ({ tour, onClose }) => {
                 : "Confirm Booking →"}
 
             </button>
+            {
+              showSuccess && (
 
+              <div
+                className="
+                fixed
+                inset-0
+                z-50
+                bg-black/50
+                flex
+                items-center
+                justify-center
+                "
+              >
+
+                <div
+                  className="
+                  bg-white
+                  rounded-3xl
+                  p-8
+                  w-full
+                  max-w-lg
+                  text-center
+                  "
+                >
+
+                  <div className="text-6xl mb-4">
+                    🎉
+                  </div>
+
+                  <h2
+                    className="
+                    text-3xl
+                    font-bold
+                    mb-3
+                    "
+                  >
+                    Booking Submitted
+                  </h2>
+
+                  <p className="text-gray-500">
+                    Your booking request
+                    has been submitted.
+                  </p>
+
+                  <div
+                    className="
+                    bg-slate-50
+                    rounded-2xl
+                    p-5
+                    mt-6
+                    text-left
+                    "
+                  >
+
+                    <p>
+                      <strong>Tour:</strong>
+                      {" "}
+                      {tour.title}
+                    </p>
+
+                    <p>
+                      <strong>Date:</strong>
+                      {" "}
+                      {form.travel_date}
+                    </p>
+
+                    <p>
+                      <strong>Travelers:</strong>
+                      {" "}
+                      {form.people_count}
+                    </p>
+
+                    <p>
+                      <strong>Total:</strong>
+                      {" "}
+                      ${totalPrice}
+                    </p>
+
+                    <p
+                      className="
+                      mt-3
+                      text-yellow-600
+                      font-semibold
+                      "
+                    >
+                      Status:
+                      Pending Approval
+                    </p>
+
+                  </div>
+                  <div
+                      className="
+                      mt-6
+                      flex
+                      gap-3
+                      "
+                    >
+
+                      <button
+                        onClick={() => {
+
+                          window.location.href =
+                          "/my-bookings";
+
+                        }}
+                        className="
+                        flex-1
+                        bg-sky-500
+                        text-white
+                        py-3
+                        rounded-xl
+                        "
+                      >
+                        View My Bookings
+                      </button>
+
+                      <button
+                        onClick={onClose}
+                        className="
+                        flex-1
+                        border
+                        py-3
+                        rounded-xl
+                        "
+                      >
+                        Continue Browsing
+                      </button>
+
+                    </div>
+                                    </div>
+
+              </div>
+
+              )
+              }
           </div>
 
         </form>
@@ -360,6 +583,7 @@ const BookingForm = ({ tour, onClose }) => {
   );
 
 };
+
 
 // ✅ REUSABLE INPUT COMPONENT
 const InputField = ({

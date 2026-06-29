@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate,useLocation } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 
 import API, { BASE_URL } from "../services/api";
@@ -22,6 +22,10 @@ import {
   Bus,
   Check,
   Heart,
+  Star,
+  MessageCircle,
+   Pencil,
+  Trash2,
 } from "lucide-react";
 
 const TourDetails = () => {
@@ -40,27 +44,137 @@ const TourDetails = () => {
   const [showModal, setShowModal] =
     useState(false);
 
+  const [reviews, setReviews] =
+  useState([]);
+
+  const [ratingInfo, setRatingInfo] =
+  useState({
+    average_rating: 0,
+    total_reviews: 0,
+  });
+
+  const [reviewForm, setReviewForm] =
+  useState({
+    rating: 5,
+    comment: "",
+  });
+
+  const [editingReview,
+setEditingReview] =
+  useState(false);
+
+const [myReview,
+setMyReview] =
+  useState(null);
+
+  const labels = {
+  1: "Terrible",
+  2: "Poor",
+  3: "Good",
+  4: "Very Good",
+  5: "Excellent",
+};
+
+const [hasReviewed, setHasReviewed] =
+  useState(false);
+
   const { user } =
     useContext(AuthContext);
 
+  const location = useLocation();
+
+
+  // useEffect(() => {
+
+  //   API.get(`/tours/${id}`)
+  //     .then((res) => {
+
+  //       setTour(res.data);
+
+  //       setTimeout(
+  //         () => setLoading(false),
+  //         500
+  //       );
+
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //     });
+
+  // }, [id]);
   useEffect(() => {
 
-    API.get(`/tours/${id}`)
-      .then((res) => {
+  const fetchData =
+    async () => {
 
-        setTour(res.data);
+      try {
+
+        const tourRes =
+          await API.get(
+            `/tours/${id}`
+          );
+
+        setTour(
+          tourRes.data
+        );
+
+        const reviewRes =
+          await API.get(
+            `/reviews/tour/${id}`
+          );
+
+        setReviews(
+          reviewRes.data.reviews
+        );
+        const currentUser =
+  JSON.parse(
+    localStorage.getItem("user")
+  );
+
+if (currentUser) {
+
+  const my =
+    reviewRes.data.reviews.find(
+      (review) =>
+        review.user_id ===
+        currentUser.id
+    );
+
+  if (my) {
+
+    setHasReviewed(true);
+
+    setMyReview(my);
+
+    setReviewForm({
+      rating: my.rating,
+      comment: my.comment,
+    });
+
+  }
+
+}
+        setRatingInfo(
+          reviewRes.data.rating
+        );
 
         setTimeout(
-          () => setLoading(false),
+          () =>
+            setLoading(false),
           500
         );
 
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+      } catch (error) {
 
-  }, [id]);
+        console.log(error);
+
+      }
+
+    };
+
+  fetchData();
+
+}, [id]);
 
   useEffect(() => {
 
@@ -70,6 +184,7 @@ const TourDetails = () => {
         : "auto";
 
   }, [showModal]);
+
   const handleWishlist = async () => {
 
   if (!user) {
@@ -79,6 +194,7 @@ const TourDetails = () => {
     return;
 
   }
+
 
   try {
 
@@ -115,6 +231,196 @@ const TourDetails = () => {
     );
 
   }
+
+};
+
+  const handleUpdateReview =
+  async () => {
+
+    try {
+
+      await API.put(
+        `/reviews/mine/${myReview.review_id}`,
+        {
+          rating:
+            reviewForm.rating,
+          comment:
+            reviewForm.comment,
+        }
+      );
+
+      const res =
+        await API.get(
+          `/reviews/tour/${id}`
+        );
+
+      setReviews(
+        res.data.reviews
+      );
+
+      const updated =
+        res.data.reviews.find(
+          (r) =>
+            r.review_id ===
+            myReview.review_id
+        );
+
+      setMyReview(
+        updated
+      );
+
+      setEditingReview(
+        false
+      );
+
+      toast.success(
+        "Review updated!"
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+      toast.error(
+        "Unable to update review"
+      );
+
+    }
+
+};
+
+const handleDeleteReview =
+  async () => {
+
+    const confirmDelete =
+      window.confirm(
+        "Delete your review?"
+      );
+
+    if (!confirmDelete)
+      return;
+
+    try {
+
+      await API.delete(
+        `/reviews/mine/${myReview.review_id}`
+      );
+
+      const res =
+        await API.get(
+          `/reviews/tour/${id}`
+        );
+
+      setReviews(
+        res.data.reviews
+      );
+
+      setRatingInfo(
+        res.data.rating
+      );
+
+      setMyReview(
+        null
+      );
+
+      setHasReviewed(
+        false
+      );
+
+      setReviewForm({
+        rating: 5,
+        comment: "",
+      });
+
+      toast.success(
+        "Review deleted!"
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+      toast.error(
+        "Unable to delete review"
+      );
+
+    }
+
+};
+
+const handleReviewSubmit =
+  async () => {
+
+    if (
+      !reviewForm.comment.trim()
+    ) {
+
+      toast.error(
+        "Please write a review."
+      );
+
+      return;
+
+    }
+
+    try {
+
+      await API.post(
+        "/reviews",
+        {
+          tour_id:
+            tour.tour_id,
+
+          rating:
+            reviewForm.rating,
+
+          comment:
+            reviewForm.comment,
+        }
+      );
+
+      const res =
+        await API.get(
+          `/reviews/tour/${id}`
+        );
+
+      setReviews(
+        res.data.reviews
+      );
+
+      setRatingInfo(
+        res.data.rating
+      );
+
+      setReviewForm({
+        rating: 5,
+        comment: "",
+      });
+      setHasReviewed(true);
+      const mine =
+  res.data.reviews.find(
+    (r) =>
+      r.user_id === user.id
+  );
+
+setMyReview(
+  mine
+);
+      toast.success(
+        "Review submitted!"
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+      toast.error(
+        error.response?.data
+          ?.message ||
+        "Unable to submit review"
+      );
+
+    }
 
 };
 
@@ -225,7 +531,9 @@ const TourDetails = () => {
 
               <span className="flex items-center gap-2">
                 <FaStar />
-                4.9 Rating
+                {ratingInfo.average_rating || 0}
+                Rating
+
               </span>
 
             </div>
@@ -257,7 +565,7 @@ const TourDetails = () => {
 
           <div className="bg-white rounded-2xl p-5 shadow text-center">
             <h3 className="text-3xl font-bold">
-              4.9
+              {ratingInfo.average_rating || 0}
             </h3>
             <p className="text-slate-500">
               Rating
@@ -423,9 +731,561 @@ const TourDetails = () => {
               </div>
 
             </div>
+            <div
+  className="
+  bg-white
+  rounded-3xl
+  shadow
+  p-8
+  "
+>
+
+  <div
+    className="
+    flex
+    items-center
+    gap-3
+    mb-6
+    "
+  >
+    <MessageCircle
+      className="text-orange-500"
+    />
+
+    <h2
+      className="
+      text-2xl
+      font-bold
+      "
+    >
+      Reviews
+    </h2>
+  </div>
+
+  <div className="mb-8">
+
+    <div
+      className="
+      flex
+      items-center
+      gap-4
+      "
+    >
+
+      <h2
+        className="
+        text-5xl
+        font-bold
+        "
+      >
+        {
+          ratingInfo
+            ?.average_rating ||
+          0
+        }
+      </h2>
+
+      <div>
+
+        <div
+          className="
+          flex
+          text-yellow-500
+          "
+        >
+          {Array.from({
+            length: 5,
+          }).map(
+            (_, i) => (
+              <Star
+                key={i}
+                size={18}
+                fill={
+                  i <
+                  Math.round(
+                    ratingInfo
+                      ?.average_rating ||
+                      0
+                  )
+                    ? "currentColor"
+                    : "none"
+                }
+              />
+            )
+          )}
+        </div>
+
+        <p className="text-gray-500">
+
+          {
+            ratingInfo
+              ?.total_reviews ||
+            0
+          }
+
+          {" "}
+          Reviews
+
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="space-y-6">
+
+    {reviews.length === 0 ? (
+
+      <div
+        className="
+        text-center
+        text-gray-500
+        py-10
+        "
+      >
+        No reviews yet.
+      </div>
+
+    ) : (
+
+      reviews.map(
+        (review) => (
+
+          <div
+            key={
+              review.review_id
+            }
+            className="
+            border-b
+            pb-5
+            "
+          >
+
+            <div
+              className="
+              flex
+              items-center
+              gap-4
+              "
+            >
+
+              <img
+                src={
+                  review.profile_image
+                    ? `http://localhost:5000/uploads/profiles/${review.profile_image}`
+                    : `https://ui-avatars.com/api/?name=${review.name}`
+                }
+                alt=""
+                className="
+                w-12
+                h-12
+                rounded-full
+                object-cover
+                "
+              />
+
+              <div>
+
+                <h3 className="font-bold">
+                  {review.name}
+                </h3>
+
+                <div
+                  className="
+                  flex
+                  text-yellow-500
+                  "
+                >
+                  {Array.from({
+                    length:
+                      review.rating,
+                  }).map(
+                    (_, i) => (
+                      <Star
+                        key={i}
+                        size={16}
+                        fill="currentColor"
+                      />
+                    )
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+
+            <p
+              className="
+              mt-3
+              text-gray-600
+              "
+            >
+              {review.comment}
+            </p>
+
+            <p
+              className="
+              text-sm
+              text-gray-400
+              mt-2
+              "
+            >
+              {new Date(
+                review.created_at
+              ).toLocaleDateString()}
+            </p>
 
           </div>
 
+        )
+      )
+
+    )}
+
+  </div>
+
+  {user && !hasReviewed && (
+
+    <div className="mt-10">
+
+      <h3
+        className="
+        text-xl
+        font-bold
+        mb-4
+        "
+      >
+        Write a Review
+      </h3>
+
+      <div
+  className="
+  flex
+  gap-2
+  mt-2
+  "
+>
+
+  {[1,2,3,4,5].map(
+    (star) => (
+
+      <button
+        key={star}
+        type="button"
+        onClick={() =>
+          setReviewForm({
+            ...reviewForm,
+            rating: star,
+          })
+        }
+      >
+
+        <Star
+          size={32}
+          className={`
+            transition
+
+            ${
+              star <=
+              reviewForm.rating
+                ? "text-yellow-500 fill-yellow-500"
+                : "text-gray-300"
+            }
+          `}
+        />
+        <p className="mt-2 text-gray-500">
+       {labels[reviewForm.rating]}
+        </p>
+
+      </button>
+
+    )
+  )}
+</div>
+
+      <textarea
+        rows={4}
+        value={
+          reviewForm.comment
+        }
+        onChange={(e) =>
+          setReviewForm({
+            ...reviewForm,
+            comment:
+              e.target.value,
+          })
+        }
+        className="
+        w-full
+        mt-4
+        border
+        rounded-2xl
+        p-4
+        "
+        placeholder="Share your experience..."
+      />
+
+      <button
+        onClick={
+          handleReviewSubmit
+        }
+        className="
+        mt-4
+        bg-orange-500
+        text-white
+        px-6
+        py-3
+        rounded-xl
+        hover:bg-orange-600
+        transition
+        "
+      >
+        Submit Review
+      </button>
+
+    </div>
+
+  )}
+
+</div>
+{user && hasReviewed && myReview && (
+
+<div
+  className="
+  mt-10
+  bg-slate-50
+  rounded-3xl
+  p-6
+  "
+>
+
+  <h3
+    className="
+    text-xl
+    font-bold
+    mb-5
+    "
+  >
+    Your Review
+  </h3>
+
+  {!editingReview ? (
+
+    <>
+      <div
+        className="
+        flex
+        text-yellow-500
+        mb-4
+        "
+      >
+        {Array.from({
+          length:
+            myReview.rating,
+        }).map(
+          (_, i) => (
+            <Star
+              key={i}
+              size={20}
+              fill="currentColor"
+            />
+          )
+        )}
+      </div>
+
+      <p className="text-gray-700">
+        {myReview.comment}
+      </p>
+
+      <p
+        className="
+        text-sm
+        text-gray-400
+        mt-3
+        "
+      >
+        {new Date(
+          myReview.created_at
+        ).toLocaleDateString()}
+      </p>
+
+<div
+  className="
+  flex
+  justify-end
+  gap-3
+  mt-6
+  "
+>
+
+  <button
+    onClick={() =>
+      setEditingReview(true)
+    }
+    className="
+    w-11
+    h-11
+    rounded-full
+    bg-sky-100
+    text-sky-600
+    flex
+    items-center
+    justify-center
+    hover:bg-sky-500
+    hover:text-white
+    transition
+    duration-300
+    "
+    title="Edit Review"
+  >
+    <Pencil size={18} />
+  </button>
+
+  <button
+    onClick={
+      handleDeleteReview
+    }
+    className="
+    w-11
+    h-11
+    rounded-full
+    bg-red-100
+    text-red-500
+    flex
+    items-center
+    justify-center
+    hover:bg-red-500
+    hover:text-white
+    transition
+    duration-300
+    "
+    title="Delete Review"
+  >
+    <Trash2 size={18} />
+  </button>
+
+</div>
+
+    </>
+
+  ) : (
+
+    <>
+      <div
+        className="
+        flex
+        gap-2
+        "
+      >
+
+        {[1,2,3,4,5].map(
+          (star) => (
+
+            <button
+              key={star}
+              onClick={() =>
+                setReviewForm({
+                  ...reviewForm,
+                  rating:
+                    star,
+                })
+              }
+            >
+
+              <Star
+                size={32}
+                className={`
+
+                  ${
+                    star <=
+                    reviewForm.rating
+                      ? "text-yellow-500 fill-yellow-500"
+                      : "text-gray-300"
+                  }
+
+                `}
+              />
+
+            </button>
+
+          )
+        )}
+
+      </div>
+
+      <textarea
+        rows={4}
+        value={
+          reviewForm.comment
+        }
+        onChange={(e) =>
+          setReviewForm({
+            ...reviewForm,
+            comment:
+              e.target.value,
+          })
+        }
+        className="
+        w-full
+        mt-4
+        border
+        rounded-2xl
+        p-4
+        "
+      />
+
+      <div
+        className="
+        flex
+        gap-4
+        mt-5
+        "
+      >
+
+        <button
+          onClick={
+            handleUpdateReview
+          }
+          className="
+          px-5
+          py-3
+          rounded-xl
+          bg-orange-500
+          text-white
+          "
+        >
+          Save Changes
+        </button>
+
+        <button
+          onClick={() =>
+            setEditingReview(
+              false
+            )
+          }
+          className="
+          px-5
+          py-3
+          rounded-xl
+          border
+          "
+        >
+          Cancel
+        </button>
+
+      </div>
+
+    </>
+
+  )}
+
+</div>
+
+)}
+          </div>
+          
           {/* RIGHT BOOKING CARD */}
 
           <div>
@@ -494,9 +1354,17 @@ const TourDetails = () => {
                 onClick={() => {
 
                   if (!user) {
+                    toast(
+                      "⚠️ Please login first to continue booking"
+                    );
 
                     navigate(
-                      "/login"
+                      "/login",
+                      {
+                        state: {
+                          from: location.pathname
+                        }
+                      }
                     );
 
                   } else {
@@ -533,11 +1401,6 @@ const TourDetails = () => {
                 space-y-2
                 "
               >
-
-                <p>
-                  ✔ Free Cancellation
-                </p>
-
                 <p>
                   ✔ Instant Confirmation
                 </p>

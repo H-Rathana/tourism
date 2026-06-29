@@ -1,14 +1,14 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { BASE_URL } from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-
+  const location = useLocation();
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -40,7 +40,10 @@ localStorage.setItem(
 
 login(data);
 
-window.location.href = "/";
+const redirectTo =
+  location.state?.from || "/";
+
+navigate(redirectTo);
   };
 
   return (

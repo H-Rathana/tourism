@@ -1,5 +1,5 @@
 import { NavLink, Link } from "react-router-dom";
-import { useState, useEffect} from "react";
+import { useState, useEffect,useRef,} from "react";
 import {
   Menu,
   X,
@@ -27,7 +27,8 @@ const Navbar = () => {
   useState(0);
 
 const navigate = useNavigate();
-
+const profileRef = useRef(null);
+const notificationRef = useRef(null);
 
 const [user, setUser] =
   useState(
@@ -333,6 +334,39 @@ useEffect(() => {
   fetchProfile();
 
 }, []);
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (
+      profileRef.current &&
+      !profileRef.current.contains(
+        event.target
+      )
+    ) {
+      setProfileOpen(false);
+    }
+
+    if (
+      notificationRef.current &&
+      !notificationRef.current.contains(
+        event.target
+      )
+    ) {
+      setNotificationOpen(false);
+    }
+  };
+
+  document.addEventListener(
+    "mousedown",
+    handleClickOutside
+  );
+
+  return () => {
+    document.removeEventListener(
+      "mousedown",
+      handleClickOutside
+    );
+  };
+}, []);
   return (
     <header
       className="
@@ -515,7 +549,10 @@ useEffect(() => {
               </button>
 
             {/* Notifications */}
-            <div className="relative">
+            <div
+                className="relative"
+                ref={notificationRef}
+              >
 
               <button
                 onClick={() =>
@@ -650,7 +687,10 @@ useEffect(() => {
             </div>
 
             {/* Profile */}
-            <div className="relative">
+            <div
+              className="relative"
+              ref={profileRef}
+            >
 
               <button
                 onClick={() => {

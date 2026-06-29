@@ -31,16 +31,21 @@ const PaymentModal = ({
         </div>
 
         {/* BOOKING ID */}
-        <div className="bg-gray-100 rounded-xl p-3 mt-5 text-center">
-
-          <p className="text-gray-500 text-sm">
+        <div
+          className="
+          bg-slate-100
+          rounded-2xl
+          p-5
+          text-center
+          "
+        >
+          <p className="text-gray-500">
             Booking Reference
           </p>
 
-          <p className="font-bold text-lg">
-            #{bookingId}
+          <p className="font-semibold">
+            Generated after payment confirmation
           </p>
-
         </div>
 
         {/* BUTTONS */}
