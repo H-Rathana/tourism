@@ -14,14 +14,15 @@ import Contact from "../pages/Contact";
 import Wishlist from "../pages/Wishlist";
 import EditProfile from "../pages/EditProfile";
 import MyBookings from "../pages/MyBookings";
-
-
+import ScrollToTop from "../components/ScrollToTop";
 
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
+      <ScrollToTop/>
       <MainLayout>
+        
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/tours" element={<Tours/>} />
@@ -37,7 +38,9 @@ const AppRoutes = () => {
           <Route path="/edit-profile"element={<EditProfile/>}/>
           <Route path="/my-bookings"element={<MyBookings/>}/>
         </Routes>
+        
       </MainLayout>
+     
     </BrowserRouter>
   );
 };

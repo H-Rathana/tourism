@@ -104,97 +104,175 @@ const handleImageChange =
 };
 
 
-const handleUpload =
-async () => {
+// const handleUpload =
+// async () => {
 
 
-  if (!image) return;
+//   if (!image) return;
 
-  try {
+//   try {
 
-    const data =
-      new FormData();
+//     const data =
+//       new FormData();
 
-    data.append(
-      "profile_image",
-      image
-    );
+//     data.append(
+//       "profile_image",
+//       image
+//     );
 
-    await API.post(
-      "/users/profile/image",
-      data
-    );
+//     await API.post(
+//       "/users/profile/image",
+//       data
+//     );
 
-    await fetchProfile();
+//     await fetchProfile();
 
-    setPreview(null);
+//     setPreview(null);
 
-    setImage(null);
+//     setImage(null);
 
-    toast.success(
-      "Profile photo updated!"
-    );
+//     toast.success(
+//       "Profile photo updated!"
+//     );
 
-  } catch(error){
+//   } catch(error){
 
-    console.log(error);
+//     console.log(error);
 
-    toast.error(
-      "Upload failed"
-    );
+//     toast.error(
+//       "Upload failed"
+//     );
 
-  }
+//   }
 
-};
-
-
-const handleSubmit =
-async (e) => {
+// };
 
 
+// const handleSubmit =
+// async (e) => {
+
+
+//   e.preventDefault();
+
+//   setSaving(true);
+
+//   try {
+
+//     // const res =
+//     //   await API.put(
+//     //     "/users/profile",
+//     //     formData
+//     //   );
+
+//     // setUser(res.data);
+
+//     // localStorage.setItem(
+//     //   "user",
+//     //   JSON.stringify(
+//     //     res.data
+//     //   )
+//     // );
+//     const res =
+//   await API.put(
+//     "/users/profile",
+//     formData
+//   );
+
+// setUser(res.data);
+
+// localStorage.setItem(
+//   "user",
+//   JSON.stringify({
+//     ...JSON.parse(
+//       localStorage.getItem("user")
+//     ),
+//     ...res.data
+//   })
+// );
+
+//     toast.success(
+//       "Profile updated successfully!"
+//     );
+
+//   } catch(error){
+
+//     console.log(error);
+
+//     toast.error(
+//       "Update failed"
+//     );
+
+//   } finally {
+
+//     setSaving(false);
+
+//   }
+
+// };
+
+const handleSubmit = async (e) => {
   e.preventDefault();
 
   setSaving(true);
 
   try {
 
-    // const res =
-    //   await API.put(
-    //     "/users/profile",
-    //     formData
-    //   );
-
-    // setUser(res.data);
-
-    // localStorage.setItem(
-    //   "user",
-    //   JSON.stringify(
-    //     res.data
-    //   )
-    // );
+    // update profile info
     const res =
-  await API.put(
-    "/users/profile",
-    formData
-  );
+      await API.put(
+        "/users/profile",
+        formData
+      );
 
-setUser(res.data);
+    let updatedUser =
+      res.data;
 
-localStorage.setItem(
-  "user",
-  JSON.stringify({
-    ...JSON.parse(
-      localStorage.getItem("user")
-    ),
-    ...res.data
-  })
-);
+    // upload image if user selected one
+    if (image) {
+
+      const data =
+        new FormData();
+
+      data.append(
+        "profile_image",
+        image
+      );
+
+      const imageRes =
+        await API.post(
+          "/users/profile/image",
+          data
+        );
+
+      updatedUser = {
+        ...updatedUser,
+        profile_image:
+          imageRes.data.profile_image,
+      };
+    }
+
+    setUser(updatedUser);
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        ...JSON.parse(
+          localStorage.getItem(
+            "user"
+          )
+        ),
+        ...updatedUser,
+      })
+    );
+
+    setImage(null);
+    setPreview(null);
 
     toast.success(
       "Profile updated successfully!"
     );
 
-  } catch(error){
+  } catch (error) {
 
     console.log(error);
 
@@ -207,7 +285,6 @@ localStorage.setItem(
     setSaving(false);
 
   }
-
 };
 
 
@@ -342,7 +419,7 @@ return (
           WanderEscape Traveler
         </p>
 
-        {image && (
+        {/* {image && (
 
           <button
             onClick={
@@ -362,7 +439,7 @@ return (
             Upload Photo
           </button>
 
-        )}
+        )} */}
 
       </div>
 

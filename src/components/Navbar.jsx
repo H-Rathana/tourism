@@ -402,6 +402,7 @@ useEffect(() => {
 
             <NavLink
               to="/"
+              end
               className={({ isActive }) =>
                 `flex items-center gap-2 transition
                 ${

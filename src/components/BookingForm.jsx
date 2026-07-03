@@ -17,7 +17,8 @@ const BookingForm = ({ tour, onClose }) => {
   const [errors, setErrors] =
     useState({});
   const [showSuccess,setShowSuccess] =useState(false);
-  const [setCreatedBooking] =useState(null);
+  const [createdBooking, setCreatedBooking] =
+  useState(null);
 
   const [pendingBooking, setPendingBooking] =useState(null);
 
@@ -32,10 +33,20 @@ const BookingForm = ({ tour, onClose }) => {
   });
 
   // ✅ TOTAL PRICE
+  
   const totalPrice =
     Number(tour.price) *
     Number(form.people_count);
 
+  const EXCHANGE_RATE = 4100;
+
+  const totalPriceKHR =
+  totalPrice * EXCHANGE_RATE;
+
+  const formattedKHR =
+  new Intl.NumberFormat(
+    "km-KH"
+  ).format(totalPriceKHR);
   // ✅ HANDLE INPUT CHANGE
   const handleChange = (e) => {
 
@@ -391,12 +402,34 @@ const BookingForm = ({ tour, onClose }) => {
               <span>Travelers</span>
               <span>x {form.people_count}</span>
             </div>
+            <div className="flex justify-between mb-2">
+              <span>Durations</span>
+              <span>{tour.duration} day</span>
+            </div>
 
             <hr className="my-3" />
 
             <div className="flex justify-between text-xl font-bold">
-              <span>Total</span>
-              <span>${totalPrice}</span>
+            <span>Total (USD)</span>
+            <span>
+              $
+              {Number(totalPrice).toFixed(2)}
+            </span>
+          </div>
+
+            <div className="flex justify-between mt-3 text-lg font-semibold text-orange-600">
+              <span>Total (KHR)</span>
+              <span>
+                {formattedKHR}៛
+              </span>
+            </div>
+
+            <div className="mt-4 text-sm text-gray-500 border-t pt-3">
+              Exchange Rate:
+              <span className="font-medium">
+                {" "}
+                1 USD = {EXCHANGE_RATE.toLocaleString()}៛
+              </span>
             </div>
 
           </div>
