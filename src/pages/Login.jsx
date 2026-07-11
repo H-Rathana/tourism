@@ -3,7 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import { BASE_URL } from "../services/api";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
-
+import toast from "react-hot-toast";
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const { login } = useContext(AuthContext);
@@ -43,7 +43,28 @@ login(data);
 const redirectTo =
   location.state?.from || "/";
 
-navigate(redirectTo);
+const openBooking =
+  location.state?.openBooking || false;
+
+// Normal login
+if (!openBooking) {
+
+  toast.success(
+    `Welcome back, ${data.user.name}! 👋`
+  );
+
+}
+
+// Redirect user
+navigate(
+  redirectTo,
+  {
+    replace: true,
+    state: {
+      openBooking
+    }
+  }
+);
   };
 
   return (

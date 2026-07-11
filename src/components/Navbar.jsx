@@ -1,5 +1,12 @@
 import { NavLink, Link } from "react-router-dom";
-import { useState, useEffect,useRef,} from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+} from "react";
+
+import { AuthContext } from "../context/AuthContext";
 import {
   Menu,
   X,
@@ -30,34 +37,32 @@ const navigate = useNavigate();
 const profileRef = useRef(null);
 const notificationRef = useRef(null);
 
-const [user, setUser] =
-  useState(
-    JSON.parse(
-      localStorage.getItem("user")
-    ) || {}
-  );
+const {
+  user,
+  logout,
+} = useContext(AuthContext);
 
 
 
-const handleLogout = () => {
+// const handleLogout = () => {
 
-  setNotifications([]);
+//   setNotifications([]);
 
-  setProfileOpen(false);
+//   setProfileOpen(false);
 
-  setNotificationOpen(false);
+//   setNotificationOpen(false);
 
-  localStorage.removeItem(
-    "token"
-  );
+//   localStorage.removeItem(
+//     "token"
+//   );
 
-  localStorage.removeItem(
-    "user"
-  );
+//   localStorage.removeItem(
+//     "user"
+//   );
 
-  navigate("/login");
+//   navigate("/login");
 
-};
+// };
 
 
 const notificationCount =
@@ -293,47 +298,47 @@ useEffect(() => {
   };
 
 }, []);
-useEffect(() => {
+// useEffect(() => {
 
-  const fetchProfile =
-    async () => {
+//   const fetchProfile =
+//     async () => {
 
-      try {
+//       try {
 
-        const token =
-          localStorage.getItem(
-            "token"
-          );
+//         const token =
+//           localStorage.getItem(
+//             "token"
+//           );
 
-        if (!token) return;
+//         if (!token) return;
 
-        const res =
-          await fetch(
-            "http://localhost:5000/api/users/profile",
-            {
-              headers: {
-                Authorization:
-                  `Bearer ${token}`
-              }
-            }
-          );
+//         const res =
+//           await fetch(
+//             "http://localhost:5000/api/users/profile",
+//             {
+//               headers: {
+//                 Authorization:
+//                   `Bearer ${token}`
+//               }
+//             }
+//           );
 
-        const data =
-          await res.json();
+//         const data =
+//           await res.json();
 
-        setUser(data);
+//         setUser(data);
 
-      } catch(error){
+//       } catch(error){
 
-        console.log(error);
+//         console.log(error);
 
-      }
+//       }
 
-    };
+//     };
 
-  fetchProfile();
+//   fetchProfile();
 
-}, []);
+// }, []);
 useEffect(() => {
   const handleClickOutside = (event) => {
     if (
@@ -696,25 +701,17 @@ useEffect(() => {
               <button
                 onClick={() => {
 
-    const token =
-      localStorage.getItem(
-        "token"
-      );
+    if (!user) {
 
-    const user =
-      localStorage.getItem(
-        "user"
-      );
+  navigate("/login");
 
-    if (
-      !token ||
-      !user
-    ) {
+  return;
 
-      navigate("/login");
-      return;
+}
 
-    }
+setProfileOpen(
+  !profileOpen
+);
 
     setProfileOpen(
       !profileOpen
@@ -866,7 +863,7 @@ useEffect(() => {
   </Link>
 
   <button
-    onClick={handleLogout}
+    onClick={logout}
     className="
     w-full
     text-left

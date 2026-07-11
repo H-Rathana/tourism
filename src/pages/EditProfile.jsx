@@ -1,9 +1,17 @@
-import { useState, useEffect } from "react";
+import {
+  useState,
+  useEffect,
+  useContext,
+} from "react";
+
+import { AuthContext } from "../context/AuthContext";
 import API from "../services/api";
 import { Camera } from "lucide-react";
 import toast from "react-hot-toast";
 
 const EditProfile = () => {
+
+const { updateUser } =useContext(AuthContext);
 
 const [user, setUser] =
 useState(null);
@@ -41,6 +49,8 @@ async () => {
 
     setUser(res.data);
 
+    updateUser(res.data);
+    
     setFormData({
 
       name:
@@ -103,113 +113,6 @@ const handleImageChange =
 
 };
 
-
-// const handleUpload =
-// async () => {
-
-
-//   if (!image) return;
-
-//   try {
-
-//     const data =
-//       new FormData();
-
-//     data.append(
-//       "profile_image",
-//       image
-//     );
-
-//     await API.post(
-//       "/users/profile/image",
-//       data
-//     );
-
-//     await fetchProfile();
-
-//     setPreview(null);
-
-//     setImage(null);
-
-//     toast.success(
-//       "Profile photo updated!"
-//     );
-
-//   } catch(error){
-
-//     console.log(error);
-
-//     toast.error(
-//       "Upload failed"
-//     );
-
-//   }
-
-// };
-
-
-// const handleSubmit =
-// async (e) => {
-
-
-//   e.preventDefault();
-
-//   setSaving(true);
-
-//   try {
-
-//     // const res =
-//     //   await API.put(
-//     //     "/users/profile",
-//     //     formData
-//     //   );
-
-//     // setUser(res.data);
-
-//     // localStorage.setItem(
-//     //   "user",
-//     //   JSON.stringify(
-//     //     res.data
-//     //   )
-//     // );
-//     const res =
-//   await API.put(
-//     "/users/profile",
-//     formData
-//   );
-
-// setUser(res.data);
-
-// localStorage.setItem(
-//   "user",
-//   JSON.stringify({
-//     ...JSON.parse(
-//       localStorage.getItem("user")
-//     ),
-//     ...res.data
-//   })
-// );
-
-//     toast.success(
-//       "Profile updated successfully!"
-//     );
-
-//   } catch(error){
-
-//     console.log(error);
-
-//     toast.error(
-//       "Update failed"
-//     );
-
-//   } finally {
-
-//     setSaving(false);
-
-//   }
-
-// };
-
 const handleSubmit = async (e) => {
   e.preventDefault();
 
@@ -251,19 +154,17 @@ const handleSubmit = async (e) => {
       };
     }
 
-    setUser(updatedUser);
+    const newUser = {
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
-        ...JSON.parse(
-          localStorage.getItem(
-            "user"
-          )
-        ),
-        ...updatedUser,
-      })
-    );
+  ...user,
+
+  ...updatedUser,
+
+};
+
+setUser(newUser);
+
+updateUser(newUser);
 
     setImage(null);
     setPreview(null);

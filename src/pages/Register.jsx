@@ -2,6 +2,8 @@ import { useState } from "react";
 import { BASE_URL } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
 const Register = () => {
@@ -12,32 +14,127 @@ const Register = () => {
   });
 
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   const res = await fetch(`${BASE_URL}/api/auth/register`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(form),
+  //   });
+
+  //   const data = await res.json();
+
+  //   if (!res.ok) {
+  //     alert(data.message);
+  //     return;
+  //   }
+
+  //   toast.success('Account registered Successfully!')
+  //   navigate("/login");
+  // };
   const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    const res = await fetch(`${BASE_URL}/api/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    });
+  e.preventDefault();
 
-    const data = await res.json();
+  try {
 
-    if (!res.ok) {
-      alert(data.message);
+    // Register user
+    const registerRes = await fetch(
+      `${BASE_URL}/api/auth/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      }
+    );
+
+    const registerData =
+      await registerRes.json();
+
+    if (!registerRes.ok) {
+
+      toast.error(
+        registerData.message
+      );
+
       return;
+
     }
 
-    toast.success('Account registered Successfully!')
-    navigate("/login");
-  };
+    // Auto Login
+    const loginRes = await fetch(
+      `${BASE_URL}/api/auth/login`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+
+          email: form.email,
+
+          password: form.password,
+
+        }),
+      }
+    );
+
+    const loginData =
+      await loginRes.json();
+
+    if (!loginRes.ok) {
+
+      toast.error(
+        "Registration successful, but auto login failed."
+      );
+
+      navigate("/login");
+
+      return;
+
+    }
+
+    // Save authentication
+    localStorage.setItem(
+      "token",
+      loginData.token
+    );
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify(loginData.user)
+    );
+
+    login(loginData);
+
+    toast.success(
+  `🎉 Welcome to WanderEscape, ${loginData.user.name}!`
+);
+
+    navigate("/");
+
+  } catch (error) {
+
+    console.error(error);
+
+    toast.error(
+      "Something went wrong."
+    );
+
+  }
+
+};
 
   return (
      <div

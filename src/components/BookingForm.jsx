@@ -38,6 +38,16 @@ const BookingForm = ({ tour, onClose }) => {
     Number(tour.price) *
     Number(form.people_count);
 
+  const tomorrow = new Date();
+
+tomorrow.setDate(
+  tomorrow.getDate() + 1
+);
+
+const minDate =
+  tomorrow
+    .toISOString()
+    .split("T")[0];
   const EXCHANGE_RATE = 4100;
 
   const totalPriceKHR =
@@ -85,7 +95,22 @@ const BookingForm = ({ tour, onClose }) => {
       newErrors.travel_date =
         "Travel date is required";
     }
+    const selectedDate =
+      new Date(form.travel_date);
 
+    const tomorrow =
+      new Date();
+
+    tomorrow.setHours(0, 0, 0, 0);
+
+    tomorrow.setDate(
+      tomorrow.getDate() + 1
+    );
+
+    if (selectedDate < tomorrow) {
+      newErrors.travel_date =
+        "Travel date must be from tomorrow onwards.";
+    }
     setErrors(newErrors);
 
     return (
@@ -330,6 +355,7 @@ const BookingForm = ({ tour, onClose }) => {
             value={form.phone}
             onChange={handleChange}
             placeholder="+855..."
+            error={errors.phone}
           />
 
           <InputField
@@ -338,6 +364,7 @@ const BookingForm = ({ tour, onClose }) => {
             name="travel_date"
             value={form.travel_date}
             onChange={handleChange}
+            min={minDate}
             error={errors.travel_date}
           />
 

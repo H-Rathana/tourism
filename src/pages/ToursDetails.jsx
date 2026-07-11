@@ -26,6 +26,16 @@ import {
   MessageCircle,
    Pencil,
   Trash2,
+  MapPin,
+  Clock3,
+  Users,
+  Languages,
+  Hotel,
+  Wifi,
+  Coffee,
+  Bath,
+  Car,
+  CheckCircle2,
 } from "lucide-react";
 
 const TourDetails = () => {
@@ -102,6 +112,31 @@ const [hasReviewed, setHasReviewed] =
   //     });
 
   // }, [id]);
+  useEffect(() => {
+
+  if (
+    user &&
+    location.state?.openBooking
+  ) {
+
+    setShowModal(true);
+
+    navigate(
+      location.pathname,
+      {
+        replace: true,
+        state: {}
+      }
+    );
+
+  }
+
+}, [
+  user,
+  location.state,
+  location.pathname,
+  navigate
+]);
   useEffect(() => {
 
   const fetchData =
@@ -184,6 +219,7 @@ if (currentUser) {
         : "auto";
 
   }, [showModal]);
+  
 
   const handleWishlist = async () => {
 
@@ -631,7 +667,204 @@ setMyReview(
               </p>
 
             </div>
+            {/* ================= TOUR INFORMATION ================= */}
 
+                <div className="mt-10 bg-white rounded-3xl shadow-lg p-8">
+
+                  <h2 className="text-2xl font-bold mb-8">
+                    Tour Information
+                  </h2>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+
+                    <div className="flex items-center gap-4">
+
+                      <MapPin className="text-sky-500"/>
+
+                      <div>
+
+                        <p className="text-sm text-gray-500">
+                          Meeting Point
+                        </p>
+
+                        <p className="font-semibold">
+                          WanderEscape Office 
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                    <div className="flex items-center gap-4">
+
+                      <Clock3 className="text-orange-500"/>
+
+                      <div>
+
+                        <p className="text-sm text-gray-500">
+                          Departure Time
+                        </p>
+
+                        <p className="font-semibold">
+                          07:30 AM
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                    <div className="flex items-center gap-4">
+
+                      <Clock3 className="text-green-500"/>
+
+                      <div>
+
+                        <p className="text-sm text-gray-500">
+                          Return Time
+                        </p>
+
+                        <p className="font-semibold">
+                          05:00 PM
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                    <div className="flex items-center gap-4">
+
+                      <Users className="text-purple-500"/>
+
+                      <div>
+
+                        <p className="text-sm text-gray-500">
+                          Group Size
+                        </p>
+
+                        <p className="font-semibold">
+                          Maximum 15 Travelers
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                    <div className="flex items-center gap-4">
+
+                      <Languages className="text-pink-500"/>
+
+                      <div>
+
+                        <p className="text-sm text-gray-500">
+                          Tour Guide
+                        </p>
+
+                        <p className="font-semibold">
+                          English / Khmer
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+            {/* ================= ACCOMMODATION ================= */}
+
+              <div className="mt-10">
+
+                <h2 className="text-2xl font-bold mb-6">
+                  Accommodation
+                </h2>
+
+                <div className="grid md:grid-cols-2 gap-6">
+
+                  {/* Hotel A */}
+
+                  <div className="bg-white rounded-3xl shadow-lg p-6">
+
+                    <div className="flex items-center gap-3 mb-4">
+
+                      <Hotel className="text-sky-500"/>
+
+                      <h3 className="text-xl font-bold">
+                        Hotel A
+                      </h3>
+
+                    </div>
+
+                    <p className="text-gray-500 mb-5">
+                      Comfortable accommodation prepared
+                      for travelers during the tour.
+                    </p>
+
+                    <div className="space-y-3">
+
+                      <Feature icon={<Wifi size={18}/>}>
+                        Free Wi-Fi
+                      </Feature>
+
+                      <Feature icon={<Coffee size={18}/>}>
+                        Breakfast Included
+                      </Feature>
+
+                      <Feature icon={<Bath size={18}/>}>
+                        Private Bathroom
+                      </Feature>
+
+                      <Feature icon={<Car size={18}/>}>
+                        Free Parking
+                      </Feature>
+
+                    </div>
+
+                  </div>
+
+                  {/* Hotel B */}
+
+                  {/* <div className="bg-white rounded-3xl shadow-lg p-6">
+
+                    <div className="flex items-center gap-3 mb-4">
+
+                      <Hotel className="text-orange-500"/>
+
+                      <h3 className="text-xl font-bold">
+                        Hotel B
+                      </h3>
+
+                    </div>
+
+                    <p className="text-gray-500 mb-5">
+                      Premium accommodation with
+                      additional facilities.
+                    </p>
+
+                    <div className="space-y-3">
+
+                      <Feature icon={<Wifi size={18}/>}>
+                        High-Speed Wi-Fi
+                      </Feature>
+
+                      <Feature icon={<Coffee size={18}/>}>
+                        Breakfast Buffet
+                      </Feature>
+
+                      <Feature icon={<Bath size={18}/>}>
+                        Deluxe Bathroom
+                      </Feature>
+
+                      <Feature icon={<Car size={18}/>}>
+                        Airport Transfer
+                      </Feature>
+
+                    </div>
+
+                  </div> */}
+
+                </div>
+
+              </div>
             {/* HIGHLIGHTS */}
 
             <div
@@ -1358,14 +1591,12 @@ setMyReview(
                       "⚠️ Please login first to continue booking"
                     );
 
-                    navigate(
-                      "/login",
-                      {
-                        state: {
-                          from: location.pathname
-                        }
+                    navigate("/login", {
+                      state: {
+                        from: location.pathname,
+                        openBooking: true
                       }
-                    );
+                    });
 
                   } else {
 
@@ -1435,6 +1666,18 @@ setMyReview(
   );
 
 };
+const Feature = ({ icon, children }) => {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="text-green-500">
+        {icon}
+      </div>
 
+      <span className="text-gray-700">
+        {children}
+      </span>
+    </div>
+  );
+};
 export default TourDetails;
 

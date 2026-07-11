@@ -33,7 +33,17 @@ export const AuthProvider = ({
     setUser(data.user);
 
   };
+  // ✅ UPDATE USER
+const updateUser = (updatedUser) => {
 
+  localStorage.setItem(
+    "user",
+    JSON.stringify(updatedUser)
+  );
+
+  setUser(updatedUser);
+
+};
   // ✅ LOGOUT
   const logout = () => {
 
@@ -107,6 +117,7 @@ export const AuthProvider = ({
         user,
         login,
         logout,
+        updateUser,
       }}
     >
       {children}
