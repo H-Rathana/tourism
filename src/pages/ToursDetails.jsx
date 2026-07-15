@@ -93,25 +93,6 @@ const [hasReviewed, setHasReviewed] =
 
   const location = useLocation();
 
-
-  // useEffect(() => {
-
-  //   API.get(`/tours/${id}`)
-  //     .then((res) => {
-
-  //       setTour(res.data);
-
-  //       setTimeout(
-  //         () => setLoading(false),
-  //         500
-  //       );
-
-  //     })
-  //     .catch((err) => {
-  //       console.error(err);
-  //     });
-
-  // }, [id]);
   useEffect(() => {
 
   if (
@@ -119,7 +100,8 @@ const [hasReviewed, setHasReviewed] =
     location.state?.openBooking
   ) {
 
-    setShowModal(true);
+    // avoid calling setState synchronously within an effect to prevent cascading renders
+    setTimeout(() => setShowModal(true), 0);
 
     navigate(
       location.pathname,
@@ -161,33 +143,24 @@ const [hasReviewed, setHasReviewed] =
         setReviews(
           reviewRes.data.reviews
         );
-        const currentUser =
-  JSON.parse(
-    localStorage.getItem("user")
+        if (user) {
+
+  const my = reviewRes.data.reviews.find(
+    (review) => review.user_id === user.id
   );
 
-if (currentUser) {
-
-  const my =
-    reviewRes.data.reviews.find(
-      (review) =>
-        review.user_id ===
-        currentUser.id
-    );
-
   if (my) {
-
     setHasReviewed(true);
-
     setMyReview(my);
 
     setReviewForm({
       rating: my.rating,
       comment: my.comment,
     });
-
+  } else {
+    setHasReviewed(false);
+    setMyReview(null);
   }
-
 }
         setRatingInfo(
           reviewRes.data.rating
@@ -1169,74 +1142,171 @@ setMyReview(
                 review.created_at
               ).toLocaleDateString()}
             </p>
+              
+              {/* {user && hasReviewed && myReview && (
 
-          </div>
-
-        )
-      )
-
-    )}
-
-  </div>
-
-  {user && !hasReviewed && (
-
-    <div className="mt-10">
-
-      <h3
-        className="
-        text-xl
-        font-bold
-        mb-4
-        "
-      >
-        Write a Review
-      </h3>
-
-      <div
+  <div
   className="
-  flex
-  gap-2
-  mt-2
+  mt-10
+  bg-slate-50
+  rounded-3xl
+  p-6
   "
 >
 
-  {[1,2,3,4,5].map(
-    (star) => (
+  <h3
+    className="
+    text-xl
+    font-bold
+    mb-5
+    "
+  >
+    Your Review
+  </h3>
 
-      <button
-        key={star}
-        type="button"
-        onClick={() =>
-          setReviewForm({
-            ...reviewForm,
-            rating: star,
-          })
-        }
+  {!editingReview ? (
+
+    <>
+      <div
+        className="
+        flex
+        text-yellow-500
+        mb-4
+        "
+      >
+        {Array.from({
+          length:
+            myReview.rating,
+        }).map(
+          (_, i) => (
+            <Star
+              key={i}
+              size={20}
+              fill="currentColor"
+            />
+          )
+        )}
+      </div>
+
+      <p className="text-gray-700">
+        {myReview.comment}
+      </p>
+
+      <p
+        className="
+        text-sm
+        text-gray-400
+        mt-3
+        "
+      >
+        {new Date(
+          myReview.created_at
+        ).toLocaleDateString()}
+      </p>
+
+<div
+  className="
+  flex
+  justify-end
+  gap-3
+  mt-6
+  "
+>
+
+  <button
+    onClick={() =>
+      setEditingReview(true)
+    }
+    className="
+    w-11
+    h-11
+    rounded-full
+    bg-sky-100
+    text-sky-600
+    flex
+    items-center
+    justify-center
+    hover:bg-sky-500
+    hover:text-white
+    transition
+    duration-300
+    "
+    title="Edit Review"
+  >
+    <Pencil size={18} />
+  </button>
+
+  <button
+    onClick={
+      handleDeleteReview
+    }
+    className="
+    w-11
+    h-11
+    rounded-full
+    bg-red-100
+    text-red-500
+    flex
+    items-center
+    justify-center
+    hover:bg-red-500
+    hover:text-white
+    transition
+    duration-300
+    "
+    title="Delete Review"
+  >
+    <Trash2 size={18} />
+  </button>
+
+</div>
+
+    </>
+
+  ) : (
+
+    <>
+      <div
+        className="
+        flex
+        gap-2
+        "
       >
 
-        <Star
-          size={32}
-          className={`
-            transition
+        {[1,2,3,4,5].map(
+          (star) => (
 
-            ${
-              star <=
-              reviewForm.rating
-                ? "text-yellow-500 fill-yellow-500"
-                : "text-gray-300"
-            }
-          `}
-        />
-        <p className="mt-2 text-gray-500">
-       {labels[reviewForm.rating]}
-        </p>
+            <button
+              key={star}
+              onClick={() =>
+                setReviewForm({
+                  ...reviewForm,
+                  rating:
+                    star,
+                })
+              }
+            >
 
-      </button>
+              <Star
+                size={32}
+                className={`
 
-    )
-  )}
-</div>
+                  ${
+                    star <=
+                    reviewForm.rating
+                      ? "text-yellow-500 fill-yellow-500"
+                      : "text-gray-300"
+                  }
+
+                `}
+              />
+
+            </button>
+
+          )
+        )}
+
+      </div>
 
       <textarea
         rows={4}
@@ -1257,35 +1327,65 @@ setMyReview(
         rounded-2xl
         p-4
         "
-        placeholder="Share your experience..."
       />
 
-      <button
-        onClick={
-          handleReviewSubmit
-        }
+      <div
         className="
-        mt-4
-        bg-orange-500
-        text-white
-        px-6
-        py-3
-        rounded-xl
-        hover:bg-orange-600
-        transition
+        flex
+        gap-4
+        mt-5
         "
       >
-        Submit Review
-      </button>
 
-    </div>
+        <button
+          onClick={
+            handleUpdateReview
+          }
+          className="
+          px-5
+          py-3
+          rounded-xl
+          bg-orange-500
+          text-white
+          "
+        >
+          Save Changes
+        </button>
+
+        <button
+          onClick={() =>
+            setEditingReview(
+              false
+            )
+          }
+          className="
+          px-5
+          py-3
+          rounded-xl
+          border
+          "
+        >
+          Cancel
+        </button>
+
+      </div>
+
+    </>
 
   )}
 
 </div>
-{user && hasReviewed && myReview && (
 
-<div
+                )} */}
+          </div>
+
+        )
+      )
+      
+    )}
+      {user && hasReviewed && myReview && (
+
+  <div
   className="
   mt-10
   bg-slate-50
@@ -1517,7 +1617,114 @@ setMyReview(
 </div>
 
 )}
-          </div>
+  </div>
+
+  {user && !hasReviewed && (
+
+    <div className="mt-10">
+
+      <h3
+        className="
+        text-xl
+        font-bold
+        mb-4
+        "
+      >
+        Write a Review
+      </h3>
+
+      <div
+  className="
+  flex
+  gap-2
+  mt-2
+  "
+>
+
+  {[1,2,3,4,5].map(
+    (star) => (
+
+      <button
+        key={star}
+        type="button"
+        onClick={() =>
+          setReviewForm({
+            ...reviewForm,
+            rating: star,
+          })
+        }
+      >
+
+        <Star
+          size={32}
+          className={`
+            transition
+
+            ${
+              star <=
+              reviewForm.rating
+                ? "text-yellow-500 fill-yellow-500"
+                : "text-gray-300"
+            }
+          `}
+        />
+        <p className="mt-2 text-gray-500">
+       {labels[reviewForm.rating]}
+        </p>
+
+      </button>
+
+    )
+  )}
+</div>
+
+      <textarea
+        rows={4}
+        value={
+          reviewForm.comment
+        }
+        onChange={(e) =>
+          setReviewForm({
+            ...reviewForm,
+            comment:
+              e.target.value,
+          })
+        }
+        className="
+        w-full
+        mt-4
+        border
+        rounded-2xl
+        p-4
+        "
+        placeholder="Share your experience..."
+      />
+
+      <button
+        onClick={
+          handleReviewSubmit
+        }
+        className="
+        mt-4
+        bg-orange-500
+        text-white
+        px-6
+        py-3
+        rounded-xl
+        hover:bg-orange-600
+        transition
+        "
+      >
+        Submit Review
+      </button>
+
+    </div>
+
+  )}
+
+</div>
+
+ </div>
           
           {/* RIGHT BOOKING CARD */}
 

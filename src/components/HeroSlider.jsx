@@ -10,6 +10,9 @@ import slide1 from "../assets/images/island.jpg";
 import slide2 from "../assets/images/Mondulkiri2.jpg";
 import slide3 from "../assets/images/AngkorToch.jpg";
 import slide4 from "../assets/images/Boat.png";
+import API from "../services/api";
+import About from "../pages/About";
+import AnimatedCounter from "../components/AnimatedCounter";
 
 const slides = [
   {
@@ -41,7 +44,19 @@ const slides = [
 const HeroSlider = () => {
   const [current, setCurrent] = useState(0);
   const navigate = useNavigate();
+  const [stats, setStats] = useState({
 
+    totalBookings: 0,
+
+    totalTours: 0,
+
+    totalUsers: 0,
+
+    completedBookings: 0,
+
+    happyTravelers: 0,
+
+});
   const nextSlide = () => {
     setCurrent((prev) =>
       (prev + 1) % slides.length
@@ -57,6 +72,26 @@ const HeroSlider = () => {
   };
 
   useEffect(() => {
+     const loadStats = async()=>{
+
+      try{
+
+         const res =
+            await API.get(
+               "/user-dashboard/home-stats"
+            );
+
+         setStats(res.data);
+
+      }catch(err){
+
+         console.log(err);
+
+      }
+
+   };
+
+   loadStats();
     const interval = setInterval(
       nextSlide,
       8000
@@ -158,61 +193,105 @@ const HeroSlider = () => {
             </button>
 
             <button
-              onClick={() =>
-                navigate("/about")
-              }
-              className="
-              border
-              border-white
-              hover:bg-white
-              hover:text-black
-              px-8
-              py-3
-              rounded-xl
-              font-semibold
-              transition
-              "
-            >
-              Learn More
-            </button>
+                onClick={() =>
+                  navigate("/about-us")
+                }
+                className="
+                border
+                border-white
+                hover:bg-white
+                hover:text-black
+                px-8
+                py-3
+                rounded-xl
+                font-semibold
+                transition
+                "
+              >
+                Learn More
+              </button>
 
           </div>
 
           {/* Stats */}
           <div
-            className="
-            flex
-            gap-10
-            mt-12
-            flex-wrap
-            "
+          className="
+          grid
+          grid-cols-2
+          md:grid-cols-4
+          gap-6
+          mt-12
+          max-w-3xl
+          "
           >
-            <div>
-              <h3 className="text-3xl font-bold">
-                500+
-              </h3>
-              <p className="text-slate-300">
-                Bookings
-              </p>
-            </div>
 
             <div>
-              <h3 className="text-3xl font-bold">
-                25+
-              </h3>
-              <p className="text-slate-300">
-                Destinations
-              </p>
-            </div>
+
+              <h2 className="text-4xl font-bold">
+
+                <AnimatedCounter
+                  end={stats.totalBookings}
+                />
+
+                +
+
+                </h2>
+
+             <p className="text-slate-300">Bookings</p>
+
+              </div>
 
             <div>
-              <h3 className="text-3xl font-bold">
-                98%
-              </h3>
-              <p className="text-slate-300">
-                Happy Travelers
-              </p>
-            </div>
+
+          <h2 className="text-4xl font-bold">
+          <AnimatedCounter
+                  end={stats.totalTours}
+                />
+          </h2>
+
+          <p className="text-slate-300">
+
+          Tours
+
+          </p>
+
+          </div>
+
+          <div>
+
+          <h2 className="text-4xl font-bold">
+          <AnimatedCounter
+                  end={stats.totalUsers}
+                />
+          +
+
+          </h2>
+
+          <p className="text-slate-300">
+
+          Travelers
+
+          </p>
+
+          </div>
+
+          <div>
+
+          <h2 className="text-4xl font-bold">
+          <AnimatedCounter
+                  end={stats.happyTravelers}
+                />
+            %
+          </h2>
+
+          <p className="text-slate-300">
+
+          Satisfaction
+
+          </p>
+
+          </div>
+
           </div>
 
         </div>

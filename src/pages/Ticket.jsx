@@ -2,7 +2,7 @@ import { useEffect, useState,useRef } from "react";
 import { useParams } from "react-router-dom";
 import logo from "../assets/images/logopng.png"
 import { QRCodeCanvas } from "qrcode.react";
-
+import { toPng } from "html-to-image";
 import { useReactToPrint } from "react-to-print";
 
 import { Download } from "lucide-react";
@@ -16,12 +16,31 @@ const TicketPage = () => {
   const [ticket, setTicket] =
     useState(null);
   const ticketRef = useRef();
+  const qrRef = useRef();
 
   const handlePrint = useReactToPrint({
   contentRef: ticketRef,
   documentTitle: `WanderEscape-Ticket-${ticket?.booking_id}`,
 });
-  
+  const handleDownloadQR = async () => {
+
+  if (!qrRef.current) return;
+
+  const dataUrl = await toPng(qrRef.current, {
+    cacheBust: true,
+    pixelRatio: 3,
+  });
+
+  const link = document.createElement("a");
+
+  link.download = `${ticketCode}.png`;
+
+  link.href = dataUrl;
+
+  link.click();
+
+};
+// Professional Ticket Code
   useEffect(() => {
 
     const fetchTicket =
@@ -59,6 +78,12 @@ const TicketPage = () => {
     );
 
   }
+  const ticketCode =
+  `WE-${
+    new Date(ticket.travel_date).getFullYear()
+  }-${
+    String(ticket.booking_id).padStart(6, "0")
+  }`;
   return (
         <div 
     className="
@@ -82,14 +107,13 @@ to-blue-500
 
       <div
   className="
-  bg-gradient-to-b
-from-sky-500
-via-cyan-400
-to-orange-400
+  bg-gradient-to-br from-emerald-600 via-teal-400 to-sky-200
  text-white p-8
   "
 >
 
+
+{/* bg-gradient-to-br from-emerald-600 via-teal-400 to-sky-200 */}
   <div
   className="
   flex
@@ -111,26 +135,49 @@ to-orange-400
 
     </div>
 
-    <button
-  onClick={handlePrint}
-  className="
-  not-print 
-  flex
-  items-center
-  gap-2
-  bg-white
-  text-sky-700
-  px-5
-  py-3
-  rounded-xl
-  font-semibold
-  hover:bg-sky-50
-  transition
-  "
->
-  <Download size={18} />
-  Download Ticket
-</button>
+    <div className="flex gap-3 not-print">
+
+        <button
+          onClick={handlePrint}
+          className="
+          flex
+          items-center
+          gap-2
+          bg-white
+          text-sky-500
+          px-5
+          py-3
+          rounded-xl
+          font-semibold
+          hover:bg-green-100
+          transition
+          "
+        >
+          <Download size={18} />
+          Ticket
+        </button>
+
+        <button
+          onClick={handleDownloadQR}
+          className="
+          flex
+          items-center
+          gap-2
+          bg-green-500
+          text-white
+          px-5
+          py-3
+          rounded-xl
+          font-semibold
+          hover:bg-green-600
+          transition
+          "
+        >
+          <Download size={18} />
+          QR Code
+        </button>
+
+    </div>
 
   </div>
 
@@ -313,7 +360,7 @@ to-orange-400
               </p>
 
               <p className="font-semibold">
-                08:00 AM
+                07:30 AM
               </p>
             </div>
 
@@ -380,6 +427,7 @@ to-orange-400
         {/* QR CODE */}
 
          <div
+            ref={qrRef}
             className="
             mt-8
             bg-white
@@ -390,17 +438,20 @@ to-orange-400
             flex-col
             items-center
             "
-            >
+          >
 
             <h3 className="text-xl font-bold">
                 Check-In QR Code
             </h3>
 
-            <p className="text-gray-500 mb-5">
-                Present this QR code on arrival
+            <p className="text-gray-500 mb-5 text-center">
+              Scan this QR code during check-in.
+              <br />
+              It securely contains your booking information.
             </p>
 
-            <div className="bg-white p-4 rounded-2xl">
+            <div
+                className=" bg-white p-5 rounded-3xl shadow-md border border-slate-200">
 
                 <QRCodeCanvas
                   value={`BOOKING-${ticket.booking_id}`}
@@ -409,11 +460,25 @@ to-orange-400
 
             </div>
 
-            <p className="mt-4 font-semibold">
-                WE-{ticket.booking_id}
+            <p className="mt-4 text-xl font-bold tracking-widest text-sky-600">
+                {ticketCode}
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+                Booking Reference Number
             </p>
 
             </div>
+            <div className="mt-6 text-center">
+
+  <p className="text-xs text-gray-400">
+    This QR Code is unique for this booking.
+  </p>
+
+  <p className="text-xs text-gray-400">
+    Do not share it with other travelers.
+  </p>
+
+</div>
         {/* SUPPORT */}
 
         <div

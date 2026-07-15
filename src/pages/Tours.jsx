@@ -13,15 +13,17 @@ import {
   Users,
   Star,
   Plane,
+  TrendingUp,
 } from "lucide-react";
 import TourList from "../components/TourList";
-
+import { useNavigate } from "react-router-dom";
+import AnimationCounter from "../components/AnimatedCounter";
 const Tours = () => {
 
   const [tours, setTours] = useState([]);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("default");
-
+  const navigate = useNavigate();
   const [searchParams] =
   useSearchParams();
 
@@ -29,12 +31,43 @@ const Tours = () => {
   searchParams.get(
     "location"
   );
+  const [stats, setStats] = useState({
+
+    totalTours:0,
+    destinations:0,
+    travelers:0,
+    averageRating:0
+
+});
+const fetchStats = async()=>{
+
+    try{
+
+        const res =
+            await fetch(
+                "http://localhost:5000/api/tours/stats"
+            );
+
+        const data =
+            await res.json();
+
+        setStats(data);
+
+    }catch(err){
+
+        console.log(err);
+
+    }
+
+};
 
   useEffect(() => {
     fetch("http://localhost:5000/api/tours")
       .then((res) => res.json())
       .then((data) => setTours(data))
       .catch((err) => console.log(err));
+
+      fetchStats();
   }, []);
 
   // Search
@@ -170,7 +203,7 @@ const Tours = () => {
         </div>
 
         {/* STATS */}
-        <div
+        {/* <div
           className="
           grid
           grid-cols-2
@@ -192,7 +225,9 @@ const Tours = () => {
               className="text-sky-500 mb-3"
             />
             <h3 className="text-2xl font-bold">
-              {tours.length}
+              <h3 className="text-2xl font-bold">
+                 {stats.totalTours}
+              </h3>
             </h3>
             <p className="text-slate-500">
               Tours
@@ -211,7 +246,9 @@ const Tours = () => {
               className="text-orange-500 mb-3"
             />
             <h3 className="text-2xl font-bold">
-              25+
+              <h3 className="text-2xl font-bold">
+                {stats.destinations}
+            </h3>
             </h3>
             <p className="text-slate-500">
               Destinations
@@ -230,7 +267,9 @@ const Tours = () => {
               className="text-green-500 mb-3"
             />
             <h3 className="text-2xl font-bold">
-              500+
+              <h3 className="text-2xl font-bold">
+                  {stats.travelers}
+              </h3>
             </h3>
             <p className="text-slate-500">
               Travelers
@@ -249,15 +288,270 @@ const Tours = () => {
               className="text-yellow-500 mb-3"
             />
             <h3 className="text-2xl font-bold">
-              4.9
+              {stats.averageRating}
             </h3>
             <p className="text-slate-500">
               Rating
             </p>
           </div>
 
-        </div>
+        </div> */}
+        <div
+          className="
+          grid
+          grid-cols-2
+          lg:grid-cols-4
+          gap-6
+          mb-12
+          "
+          >
 
+          {/* Tours */}
+
+          <div
+          className="
+          bg-white
+          rounded-3xl
+          shadow-lg
+          hover:shadow-xl
+          transition
+          p-6
+          group
+          "
+          >
+
+          <div className="flex justify-between items-start">
+
+          <div
+          className="
+          w-14
+          h-14
+          rounded-2xl
+          bg-sky-100
+          flex
+          items-center
+          justify-center
+          group-hover:scale-110
+          transition
+          "
+          >
+
+          <Plane
+          size={28}
+          className="text-sky-600"
+          />
+
+          </div>
+
+          <TrendingUp
+          size={18}
+          className="text-green-500"
+          />
+
+          </div>
+
+          <p className="text-slate-500 mt-6">
+          Available Tours
+          </p>
+
+          <h2 className="text-4xl font-bold mt-2">
+
+          <AnimationCounter
+            end={stats.totalTours}
+          />
+
+          </h2>
+
+          <p className="text-sm text-green-600 mt-3">
+          Explore Cambodia
+          </p>
+
+          </div>
+
+          {/* Destinations */}
+
+          <div
+          className="
+          bg-white
+          rounded-3xl
+          shadow-lg
+          hover:shadow-xl
+          transition
+          p-6
+          group
+          "
+          >
+
+          <div className="flex justify-between items-start">
+
+          <div
+          className="
+          w-14
+          h-14
+          rounded-2xl
+          bg-orange-100
+          flex
+          items-center
+          justify-center
+          group-hover:scale-110
+          transition
+          "
+          >
+
+          <MapPin
+          size={28}
+          className="text-orange-500"
+          />
+
+          </div>
+
+          <TrendingUp
+          size={18}
+          className="text-green-500"
+          />
+
+          </div>
+
+          <p className="text-slate-500 mt-6">
+          Destinations
+          </p>
+
+          <h2 className="text-4xl font-bold mt-2">
+
+          <AnimationCounter end={stats.destinations} />
+
+          </h2>
+
+          <p className="text-sm text-orange-500 mt-3">
+          Across Cambodia
+          </p>
+
+          </div>
+
+          {/* Travelers */}
+
+          <div
+          className="
+          bg-white
+          rounded-3xl
+          shadow-lg
+          hover:shadow-xl
+          transition
+          p-6
+          group
+          "
+          >
+
+          <div className="flex justify-between items-start">
+
+          <div
+          className="
+          w-14
+          h-14
+          rounded-2xl
+          bg-green-100
+          flex
+          items-center
+          justify-center
+          group-hover:scale-110
+          transition
+          "
+          >
+
+          <Users
+          size={28}
+          className="text-green-600"
+          />
+
+          </div>
+
+          <TrendingUp
+          size={18}
+          className="text-green-500"
+          />
+
+          </div>
+
+          <p className="text-slate-500 mt-6">
+          Happy Travelers
+          </p>
+
+          <h2 className="text-4xl font-bold mt-2">
+
+          <AnimationCounter end={stats.travelers} />
+          
+          </h2>
+
+          <p className="text-sm text-green-600 mt-3">
+          Completed Bookings
+          </p>
+
+          </div>
+
+          {/* Rating */}
+
+          <div
+          className="
+          bg-white
+          rounded-3xl
+          shadow-lg
+          hover:shadow-xl
+          transition
+          p-6
+          group
+          "
+          >
+
+          <div className="flex justify-between items-start">
+
+          <div
+          className="
+          w-14
+          h-14
+          rounded-2xl
+          bg-yellow-100
+          flex
+          items-center
+          justify-center
+          group-hover:scale-110
+          transition
+          "
+          >
+
+          <Star
+          size={28}
+          className="text-yellow-500"
+          />
+
+          </div>
+
+          <TrendingUp
+          size={18}
+          className="text-green-500"
+          />
+
+          </div>
+
+          <p className="text-slate-500 mt-6">
+          Average Rating
+          </p>
+
+          <h2 className="text-4xl font-bold mt-2">
+
+          <AnimationCounter
+              end={stats.averageRating}
+              decimals={1}
+            />
+
+          </h2>
+
+          <p className="text-sm text-yellow-500 mt-3">
+          Verified Reviews
+          </p>
+
+          </div>
+
+          </div>
         {/* SEARCH + SORT */}
         <div
           className="
@@ -405,6 +699,9 @@ const Tours = () => {
           </p>
 
           <button
+          onClick={() =>
+                navigate("/contact-us")
+              }
             className="
             mt-6
             bg-white
