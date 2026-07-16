@@ -157,6 +157,7 @@ const HeroSlider = () => {
             leading-tight
             mb-6
             "
+            data-aos="fade-right"
           >
             {slides[current].title}
           </h1>

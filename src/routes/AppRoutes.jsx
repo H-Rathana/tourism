@@ -15,7 +15,7 @@ import Wishlist from "../pages/Wishlist";
 import EditProfile from "../pages/EditProfile";
 import MyBookings from "../pages/MyBookings";
 import ScrollToTop from "../components/ScrollToTop";
-
+import Notifications from "../pages/Notifications";
 
 const AppRoutes = () => {
   return (
@@ -37,6 +37,7 @@ const AppRoutes = () => {
           <Route path="/wishlist"element={<Wishlist/>}/>
           <Route path="/edit-profile"element={<EditProfile/>}/>
           <Route path="/my-bookings"element={<MyBookings/>}/>
+          <Route path="/notifications"element={<Notifications />}/>
         </Routes>
         
       </MainLayout>

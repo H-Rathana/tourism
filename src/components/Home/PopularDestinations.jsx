@@ -52,6 +52,8 @@ const PopularDestinations = () => {
               shadow-lg
               cursor-pointer
               "
+              data-aos="fade-up"
+              data-aos-delay="{index*100}"
             >
               <img
                 src={item.image}

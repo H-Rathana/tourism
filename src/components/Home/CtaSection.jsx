@@ -14,7 +14,7 @@ const CtaSection = () => {
       flex
       items-center
       justify-center
-      "
+      "      
     >
 
       {/* Background Image */}

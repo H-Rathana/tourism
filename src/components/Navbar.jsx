@@ -42,29 +42,6 @@ const {
   logout,
 } = useContext(AuthContext);
 
-
-
-// const handleLogout = () => {
-
-//   setNotifications([]);
-
-//   setProfileOpen(false);
-
-//   setNotificationOpen(false);
-
-//   localStorage.removeItem(
-//     "token"
-//   );
-
-//   localStorage.removeItem(
-//     "user"
-//   );
-
-//   navigate("/login");
-
-// };
-
-
 const notificationCount =
   notifications.filter(
     (n) => !n.is_read
@@ -372,6 +349,25 @@ useEffect(() => {
     );
   };
 }, []);
+const mobileNavClass = `
+flex
+items-center
+gap-4
+
+px-4
+py-4
+
+rounded-2xl
+
+text-slate-700
+font-medium
+
+hover:bg-sky-50
+hover:text-sky-600
+
+transition-all
+duration-300
+`;
   return (
     <header
       className="
@@ -900,141 +896,334 @@ setProfileOpen(
         </div>
 
         {/* Mobile Menu */}
-        {menuOpen && (
+        
+        {/* ================= MOBILE DRAWER ================= */}
+
+     {menuOpen && (
+     <>
+    {/* BACKDROP */}
+    <div
+      onClick={() => setMenuOpen(false)}
+      className="
+      fixed
+      inset-0
+      bg-black/50
+      backdrop-blur-sm
+      z-40
+      lg:hidden
+      "
+    />
+
+    {/* DRAWER */}
+    <div
+      className="
+      fixed
+      top-0
+      left-0
+
+      h-screen
+      w-[320px]
+      max-w-[85%]
+
+      bg-white
+
+      z-50
+
+      flex
+      flex-col
+
+      shadow-2xl
+
+      lg:hidden
+      "
+    >
+
+      {/* ================= HEADER ================= */}
+
+      <div
+        className="
+        flex
+        items-center
+        justify-between
+
+        px-5
+        py-4
+
+        border-b
+        "
+      >
+        <img
+          src={logo}
+          alt="logo"
+          className="h-12"
+        />
+
+        <button
+          onClick={() => setMenuOpen(false)}
+          className="text-3xl"
+        >
+          ×
+        </button>
+      </div>
+
+      {/* ================= PROFILE ================= */}
+
+      {user ? (
+
+        <div
+          className="
+          p-5
+
+          flex
+          items-center
+          gap-4
+
+          border-b
+          "
+        >
 
           <div
             className="
-            lg:hidden
-            py-6
-            flex
-            flex-col
-            gap-5
-            border-t
+            w-16
+            h-16
+            rounded-full
+            overflow-hidden
+            bg-sky-100
             "
           >
-            <Link to="/">Home</Link>
-            <Link to="/destinations">
-              Destinations
-            </Link>
-            <Link to="/tours">
-              Tours
-            </Link>
-            <Link to="/travel-guides">
-              Travel Guides
-            </Link>
-            <Link to="/my-bookings">
-              My Bookings
-            </Link>
-            <Link to="/about-us">
-              About us
-            </Link>
-            <Link to="/contact-us">
-              Contact us
-            </Link>
-           <div className="relative">
 
-  <button
-    onClick={() =>
-      setNotificationOpen(
-        !notificationOpen
-      )
-    }
-    className="relative"
-  >
-    <Bell size={22} />
+            {user.profile_image ? (
 
-    {notificationCount > 0 && (
-      <span
+              <img
+                src={`http://localhost:5000/uploads/profiles/${user.profile_image}`}
+                alt={user.name}
+                className="
+                w-full
+                h-full
+                object-cover
+                "
+              />
+
+            ) : (
+
+              <div
+                className="
+                w-full
+                h-full
+
+                flex
+                items-center
+                justify-center
+                "
+              >
+                <User
+                  size={28}
+                  className="text-sky-600"
+                />
+              </div>
+
+            )}
+
+          </div>
+
+          <div>
+
+            <h3 className="font-bold text-lg">
+              {user.name}
+            </h3>
+
+            <p className="text-sm text-slate-500">
+              {user.email}
+            </p>
+
+          </div>
+
+        </div>
+
+      ) : (
+
+        <div className="p-5 border-b">
+
+          <p className="font-semibold mb-4">
+            Welcome to WanderEscape
+          </p>
+
+          <button
+            onClick={()=>{
+              navigate("/login");
+              setMenuOpen(false);
+            }}
+            className="
+            w-full
+            bg-sky-500
+            text-white
+            py-3
+            rounded-xl
+            mb-3
+            "
+          >
+            Login
+          </button>
+
+          <button
+            onClick={()=>{
+              navigate("/register");
+              setMenuOpen(false);
+            }}
+            className="
+            w-full
+            border
+            border-sky-500
+            text-sky-600
+            py-3
+            rounded-xl
+            "
+          >
+            Create Account
+          </button>
+
+        </div>
+
+      )}
+
+      {/* ================= SCROLLABLE MENU ================= */}
+
+      <div
         className="
-        absolute
-        -top-2
-        -right-2
-        bg-red-500
-        text-white
-        text-xs
-        w-5
-        h-5
-        rounded-full
-        flex
-        items-center
-        justify-center
+        flex-1
+        overflow-y-auto
+
+        p-4
+
+        space-y-2
         "
       >
-        {notificationCount}
-      </span>
-    )}
-  </button>
 
-  {notificationOpen && (
-    <div
-      className="
-      absolute
-      bottom-12
-      left-0
-      w-80
-      max-h-80
-      overflow-y-auto
-      bg-white
-      rounded-2xl
-      shadow-2xl
-      border
-      z-50
-      "
-    >
-      <div className="p-4 border-b">
-        <h3 className="font-semibold">
-          Notifications
+        <Link to="/" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
+          <Home size={22}/>
+          Home
+        </Link>
+
+        <Link to="/destinations" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
+          <MapPinned size={22}/>
+          Destinations
+        </Link>
+
+        <Link to="/tours" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
+          <Package size={22}/>
+          Tours
+        </Link>
+
+        <Link to="/travel-guides" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
+          <MapPinned size={22}/>
+          Travel Guides
+        </Link>
+
+        <Link to="/my-bookings" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
+          <ClipboardList size={22}/>
+          My Bookings
+        </Link>
+
+        <Link to="/about-us" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
+          <Info size={22}/>
+          About Us
+        </Link>
+
+        <Link to="/contact-us" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
+          <Phone size={22}/>
+          Contact Us
+        </Link>
+
+        <div className="border-t my-4"></div>
+
+        <h3
+          className="
+          text-xs
+          uppercase
+          tracking-widest
+          text-slate-400
+          px-2
+          "
+        >
+          My Account
         </h3>
+
+        <Link
+          to="/wishlist"
+          onClick={()=>setMenuOpen(false)}
+          className={mobileNavClass}
+        >
+          <Heart
+            size={22}
+            className="text-red-500"
+          />
+
+          Wishlist
+        </Link>
+
+        <Link
+          to="/notifications"
+          onClick={()=>setMenuOpen(false)}
+          className={mobileNavClass}
+        >
+          <Bell size={22}/>
+          Notifications
+        </Link>
+
+        <Link
+          to="/edit-profile"
+          onClick={()=>setMenuOpen(false)}
+          className={mobileNavClass}
+        >
+          <User size={22}/>
+          Edit Profile
+        </Link>
+
       </div>
 
-      {notifications.length === 0 ? (
-        <div className="p-4 text-gray-500">
-          No notifications
+      {/* ================= FIXED FOOTER ================= */}
+
+      {user && (
+
+        <div
+          className="
+          border-t
+          p-4
+          "
+        >
+
+          <button
+            onClick={()=>{
+              logout();
+              setMenuOpen(false);
+            }}
+            className="
+            w-full
+
+            bg-red-500
+            hover:bg-red-600
+
+            text-white
+
+            py-3
+
+            rounded-xl
+
+            font-semibold
+
+            transition
+            "
+          >
+            Logout
+          </button>
+
         </div>
-      ) : (
-        notifications.map(
-          (notification) => (
-            <div
-              key={
-                notification.notification_id
-              }
-              onClick={() =>
-                handleReadNotification(
-                  notification.notification_id
-                )
-              }
-              className={`
-                p-4
-                border-b
-                cursor-pointer
-                hover:bg-slate-50
-                ${
-                  !notification.is_read
-                    ? "bg-blue-50"
-                    : ""
-                }
-              `}
-            >
-              <p className="text-sm">
-                {notification.message}
-              </p>
 
-              <p className="text-xs text-gray-400 mt-1">
-                {new Date(
-                  notification.created_at
-                ).toLocaleString()}
-              </p>
-            </div>
-          )
-        )
       )}
-    </div>
-  )}
 
-</div>
-          </div>
-          
-        )}
+    </div>
+  </>
+)}
           
       </div>
     </header>

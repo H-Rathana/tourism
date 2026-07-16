@@ -40,7 +40,7 @@ const FeaturedTours = () => {
 
   return (
 
-      <section className="bg-slate-50 py-20">
+      <section className="bg-slate-50 py-20" data-aos="fade-up">
 
       <div className="max-w-7xl mx-auto px-6">
 
@@ -77,7 +77,7 @@ const FeaturedTours = () => {
       >
 
         {/* Hero Tour */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3" data-aos="fade-right">
 
           <PopularTourCard
             tour={heroTour}
@@ -87,7 +87,7 @@ const FeaturedTours = () => {
         </div>
 
         {/* Side Tours */}
-        <div className="lg:col-span-2 flex flex-col gap-6">
+        <div className="lg:col-span-2 flex flex-col gap-6" data-aos="fade-left">
 
           {sideTours.map((tour, index) => (
 
