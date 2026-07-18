@@ -50,7 +50,7 @@ const openBooking =
 if (!openBooking) {
 
   toast.success(
-    `Welcome back, ${data.user.name}! 👋`
+    `Welcome back, ${data.user.name}! 👋`,{duration: 6000,}
   );
 
 }
