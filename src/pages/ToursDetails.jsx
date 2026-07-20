@@ -794,47 +794,6 @@ setMyReview(
 
                   </div>
 
-                  {/* Hotel B */}
-
-                  {/* <div className="bg-white rounded-3xl shadow-lg p-6">
-
-                    <div className="flex items-center gap-3 mb-4">
-
-                      <Hotel className="text-orange-500"/>
-
-                      <h3 className="text-xl font-bold">
-                        Hotel B
-                      </h3>
-
-                    </div>
-
-                    <p className="text-gray-500 mb-5">
-                      Premium accommodation with
-                      additional facilities.
-                    </p>
-
-                    <div className="space-y-3">
-
-                      <Feature icon={<Wifi size={18}/>}>
-                        High-Speed Wi-Fi
-                      </Feature>
-
-                      <Feature icon={<Coffee size={18}/>}>
-                        Breakfast Buffet
-                      </Feature>
-
-                      <Feature icon={<Bath size={18}/>}>
-                        Deluxe Bathroom
-                      </Feature>
-
-                      <Feature icon={<Car size={18}/>}>
-                        Airport Transfer
-                      </Feature>
-
-                    </div>
-
-                  </div> */}
-
                 </div>
 
               </div>
