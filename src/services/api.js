@@ -6,7 +6,14 @@ export const BASE_URL =
 const API = axios.create({
   baseURL: `${BASE_URL}/api`,
 });
+export const getHomeReviews = async () => {
 
+  const res =
+    await API.get("/reviews/home");
+
+  return res.data;
+
+};
 // ✅ ATTACH TOKEN
 API.interceptors.request.use(
   (config) => {

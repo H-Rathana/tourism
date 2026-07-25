@@ -62,7 +62,7 @@ const fetchStats = async()=>{
 };
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/tours")
+    fetch("http://localhost:5000/api/tours/available")
       .then((res) => res.json())
       .then((data) => setTours(data))
       .catch((err) => console.log(err));

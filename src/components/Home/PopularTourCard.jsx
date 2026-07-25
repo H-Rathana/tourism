@@ -93,7 +93,7 @@ return(
             src={`http://localhost:5000/uploads/${tour.image}`}
 
             alt={tour.title}
-
+            
             className="
             w-full
             h-full

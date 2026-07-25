@@ -104,10 +104,11 @@ const HeroSlider = () => {
     <section
       className="
       relative
-      h-[60vh]
+      h-[520px]
+      sm:h-[580px]
       md:h-[85vh]
       overflow-hidden
-      "
+    "
     >
       {/* Background Image */}
       <img
@@ -129,17 +130,21 @@ const HeroSlider = () => {
 
       {/* Content */}
       <div
-        className="
-        relative
-        z-10
-        h-full
-        max-w-7xl
-        mx-auto
-        px-6
-        flex
-        items-center
-        "
-      >
+          className="
+          relative
+          z-10
+          h-full
+          max-w-7xl
+          mx-auto
+          px-6
+
+          flex
+          items-center
+
+          pt-10
+          md:pt-0
+          "
+        > 
         <div className="max-w-3xl text-white">
 
           <div className="flex items-center gap-2 mb-4">
@@ -188,6 +193,7 @@ const HeroSlider = () => {
               rounded-xl
               font-semibold
               transition
+              cursor-pointer
               "
             >
               Explore Tours
@@ -207,6 +213,7 @@ const HeroSlider = () => {
                 rounded-xl
                 font-semibold
                 transition
+                cursor-pointer
                 "
               >
                 Learn More

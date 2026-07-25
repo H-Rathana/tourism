@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { BASE_URL } from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
@@ -17,6 +17,7 @@ const Register = () => {
 const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -101,7 +102,8 @@ setLoading(true);
       return;
 
     }
-
+    const redirectTo =
+    location.state?.from || "/";
     // Auto Login
     const loginRes = await fetch(
       `${BASE_URL}/api/auth/login`,
@@ -148,7 +150,13 @@ setLoading(true);
 
     login(loginData);
 
-     navigate("/");
+     navigate(redirectTo, {
+        replace: true,
+        state: {
+          openBooking:
+            location.state?.openBooking || false,
+        },
+      });
 
     toast.success(
   `🎉 Welcome to WanderEscape, ${loginData.user.name}!`,
@@ -222,7 +230,7 @@ setLoading(true);
               name="password"
               autoComplete="new-password"
               onChange={handleChange}
-              placeholder="Password"
+              placeholder="(Strong Password)"
               className="w-full bg-transparent border-b border-white/70 focus:outline-none py-2 placeholder-white/70 focus:border-white focus:scale-105 
            transition duration-300 ease-in-out"
             />
@@ -288,7 +296,11 @@ setLoading(true);
         <p className="text-sm mt-6">
           Already have an account?{" "}
           <span
-            onClick={() => navigate("/login")}
+            onClick={() =>
+              navigate("/login", {
+                state: location.state,
+              })
+            }
             className="underline font-semibold cursor-pointer"
           >
             Login

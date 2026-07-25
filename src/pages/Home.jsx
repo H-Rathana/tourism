@@ -4,6 +4,7 @@ import PopularDestinations from "../components/Home/PopularDestinations";
 import FeaturedTours from "../components/Home/FeaturedTours";
 import WhyChooseUs from "../components/Home/WhyChooseUs";
 import CtaSection from "../components/Home/CTASection";
+import Testimonials from "../components/Home/Testimonials";
 
 const Home = () => {
    
@@ -13,6 +14,7 @@ const Home = () => {
       <HeroSlider/>
       <PopularDestinations/> 
       <FeaturedTours/>
+      <Testimonials/>
       <WhyChooseUs/>
       <CtaSection/>
 

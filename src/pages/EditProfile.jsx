@@ -414,6 +414,7 @@ return (
             onChange={
               handleChange
             }
+            readOnly
             className="
             w-full
             border

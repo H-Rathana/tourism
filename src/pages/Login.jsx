@@ -130,7 +130,9 @@ navigate(
         <p className="text-sm mt-6">
           Don’t have an account?{" "}
           <span
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/register", {
+                state: location.state,
+              })}
             className="font-semibold underline cursor-pointer"
           >
             Sign Up

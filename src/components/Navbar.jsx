@@ -705,9 +705,9 @@ duration-300
 
 }
 
-setProfileOpen(
-  !profileOpen
-);
+// setProfileOpen(
+//   !profileOpen
+// );
 
     setProfileOpen(
       !profileOpen
@@ -895,63 +895,52 @@ setProfileOpen(
 
         </div>
 
-        {/* Mobile Menu */}
+
         
-        {/* ================= MOBILE DRAWER ================= */}
+{/* ================= MOBILE DRAWER ================= */}
 
-     {menuOpen && (
-     <>
-    {/* BACKDROP */}
+{menuOpen && (
+  <div
+    className="
+    fixed
+    inset-0
+    z-[9999]
+    lg:hidden
+"
+  >
+    {/* Backdrop */}
     <div
-      onClick={() => setMenuOpen(false)}
-      className="
-      fixed
-      inset-0
-      bg-black/50
-      backdrop-blur-sm
-      z-40
-      lg:hidden
-      "
-    />
+  onClick={() => setMenuOpen(false)}
+  className="
+    absolute
+    inset-0
+    bg-black/50
+    backdrop-blur-sm
+"
+/>
 
-    {/* DRAWER */}
+    {/* Drawer */}
     <div
+      onClick={(e) => e.stopPropagation()}
       className="
-      fixed
-      top-0
-      left-0
-
-      h-screen
-      w-[320px]
-      max-w-[85%]
-
-      bg-white
-
-      z-50
-
-      flex
-      flex-col
-
-      shadow-2xl
-
-      lg:hidden
+        absolute
+        top-0
+        left-0
+        h-screen
+        w-[320px]
+        max-w-[85%]
+        bg-white
+        shadow-2xl
+        flex
+        flex-col
+        animate-slide-in
       "
     >
 
       {/* ================= HEADER ================= */}
 
-      <div
-        className="
-        flex
-        items-center
-        justify-between
+      <div className="flex items-center justify-between px-5 py-4 border-b">
 
-        px-5
-        py-4
-
-        border-b
-        "
-      >
         <img
           src={logo}
           alt="logo"
@@ -964,62 +953,34 @@ setProfileOpen(
         >
           ×
         </button>
+
       </div>
 
       {/* ================= PROFILE ================= */}
 
       {user ? (
 
-        <div
-          className="
-          p-5
+        <div className="p-5 flex items-center gap-4 border-b">
 
-          flex
-          items-center
-          gap-4
-
-          border-b
-          "
-        >
-
-          <div
-            className="
-            w-16
-            h-16
-            rounded-full
-            overflow-hidden
-            bg-sky-100
-            "
-          >
+          <div className="w-16 h-16 rounded-full overflow-hidden bg-sky-100">
 
             {user.profile_image ? (
 
               <img
                 src={`http://localhost:5000/uploads/profiles/${user.profile_image}`}
                 alt={user.name}
-                className="
-                w-full
-                h-full
-                object-cover
-                "
+                className="w-full h-full object-cover"
               />
 
             ) : (
 
-              <div
-                className="
-                w-full
-                h-full
+              <div className="w-full h-full flex items-center justify-center">
 
-                flex
-                items-center
-                justify-center
-                "
-              >
                 <User
                   size={28}
                   className="text-sky-600"
                 />
+
               </div>
 
             )}
@@ -1049,34 +1010,34 @@ setProfileOpen(
           </p>
 
           <button
-            onClick={()=>{
+            onClick={() => {
               navigate("/login");
               setMenuOpen(false);
             }}
             className="
-            w-full
-            bg-sky-500
-            text-white
-            py-3
-            rounded-xl
-            mb-3
+              w-full
+              bg-sky-500
+              text-white
+              py-3
+              rounded-xl
+              mb-3
             "
           >
             Login
           </button>
 
           <button
-            onClick={()=>{
+            onClick={() => {
               navigate("/register");
               setMenuOpen(false);
             }}
             className="
-            w-full
-            border
-            border-sky-500
-            text-sky-600
-            py-3
-            rounded-xl
+              w-full
+              border
+              border-sky-500
+              text-sky-600
+              py-3
+              rounded-xl
             "
           >
             Create Account
@@ -1086,132 +1047,131 @@ setProfileOpen(
 
       )}
 
-      {/* ================= SCROLLABLE MENU ================= */}
+      {/* ================= MENU ================= */}
 
-      <div
-        className="
-        flex-1
-        overflow-y-auto
+      <div className="flex-1 overflow-y-auto p-4 space-y-2">
 
-        p-4
-
-        space-y-2
-        "
-      >
-
-        <Link to="/" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
-          <Home size={22}/>
+        <Link
+          to="/"
+          onClick={() => setMenuOpen(false)}
+          className={mobileNavClass}
+        >
+          <Home size={22} />
           Home
         </Link>
 
-        <Link to="/destinations" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
-          <MapPinned size={22}/>
+        <Link
+          to="/destinations"
+          onClick={() => setMenuOpen(false)}
+          className={mobileNavClass}
+        >
+          <MapPinned size={22} />
           Destinations
         </Link>
 
-        <Link to="/tours" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
-          <Package size={22}/>
+        <Link
+          to="/tours"
+          onClick={() => setMenuOpen(false)}
+          className={mobileNavClass}
+        >
+          <Package size={22} />
           Tours
         </Link>
 
-        <Link to="/travel-guides" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
-          <MapPinned size={22}/>
+        <Link
+          to="/travel-guides"
+          onClick={() => setMenuOpen(false)}
+          className={mobileNavClass}
+        >
+          <MapPinned size={22} />
           Travel Guides
         </Link>
 
-        <Link to="/my-bookings" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
-          <ClipboardList size={22}/>
+        <Link
+          to="/my-bookings"
+          onClick={() => setMenuOpen(false)}
+          className={mobileNavClass}
+        >
+          <ClipboardList size={22} />
           My Bookings
         </Link>
 
-        <Link to="/about-us" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
-          <Info size={22}/>
+        <Link
+          to="/about-us"
+          onClick={() => setMenuOpen(false)}
+          className={mobileNavClass}
+        >
+          <Info size={22} />
           About Us
         </Link>
 
-        <Link to="/contact-us" onClick={()=>setMenuOpen(false)} className={mobileNavClass}>
-          <Phone size={22}/>
+        <Link
+          to="/contact-us"
+          onClick={() => setMenuOpen(false)}
+          className={mobileNavClass}
+        >
+          <Phone size={22} />
           Contact Us
         </Link>
 
-        <div className="border-t my-4"></div>
+        <div className="border-t my-4" />
 
-        <h3
-          className="
-          text-xs
-          uppercase
-          tracking-widest
-          text-slate-400
-          px-2
-          "
-        >
+        <h3 className="text-xs uppercase tracking-widest text-slate-400 px-2">
           My Account
         </h3>
 
         <Link
           to="/wishlist"
-          onClick={()=>setMenuOpen(false)}
+          onClick={() => setMenuOpen(false)}
           className={mobileNavClass}
         >
           <Heart
             size={22}
             className="text-red-500"
           />
-
           Wishlist
         </Link>
 
         <Link
           to="/notifications"
-          onClick={()=>setMenuOpen(false)}
+          onClick={() => setMenuOpen(false)}
           className={mobileNavClass}
         >
-          <Bell size={22}/>
+          <Bell size={22} />
           Notifications
         </Link>
 
         <Link
           to="/edit-profile"
-          onClick={()=>setMenuOpen(false)}
+          onClick={() => setMenuOpen(false)}
           className={mobileNavClass}
         >
-          <User size={22}/>
+          <User size={22} />
           Edit Profile
         </Link>
 
       </div>
 
-      {/* ================= FIXED FOOTER ================= */}
+      {/* ================= FOOTER ================= */}
 
       {user && (
 
-        <div
-          className="
-          border-t
-          p-4
-          "
-        >
+        <div className="border-t p-4">
 
           <button
-            onClick={()=>{
+            onClick={() => {
               logout();
               setMenuOpen(false);
             }}
             className="
-            w-full
-
-            bg-red-500
-            hover:bg-red-600
-
-            text-white
-
-            py-3
-
-            rounded-xl
-
-            font-semibold
-
-            transition
+              w-full
+              bg-red-500
+              hover:bg-red-600
+              text-white
+              py-3
+              rounded-xl
+              font-semibold
+              transition
             "
           >
             Logout
@@ -1222,7 +1182,7 @@ setProfileOpen(
       )}
 
     </div>
-  </>
+  </div>
 )}
           
       </div>

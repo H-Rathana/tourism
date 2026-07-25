@@ -36,6 +36,7 @@ import {
   Bath,
   Car,
   CheckCircle2,
+  CalendarDays,
 } from "lucide-react";
 
 const TourDetails = () => {
@@ -54,8 +55,9 @@ const TourDetails = () => {
   const [showModal, setShowModal] =
     useState(false);
 
-  const [reviews, setReviews] =
-  useState([]);
+  const [reviews, setReviews] = useState([]);
+
+  const [gallery, setGallery] = useState([]);
 
   const [ratingInfo, setRatingInfo] =
   useState({
@@ -84,6 +86,7 @@ setMyReview] =
   4: "Very Good",
   5: "Excellent",
 };
+
 
 const [hasReviewed, setHasReviewed] =
   useState(false);
@@ -134,6 +137,10 @@ const [hasReviewed, setHasReviewed] =
         setTour(
           tourRes.data
         );
+        const galleryRes =
+        await API.get(`/gallery/${id}`);
+
+        setGallery(galleryRes.data);
 
         const reviewRes =
           await API.get(
@@ -432,6 +439,21 @@ setMyReview(
     }
 
 };
+const formatDate = (date) =>
+  new Date(date).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+const seatPercentage = tour
+  ? (tour.remaining_seats / tour.max_people) * 100
+  : 0;
+
+const itineraryItems =
+  tour?.itinerary
+    ?.split("\n")
+    .filter(item => item.trim() !== "") || [];
 
   if (loading)
     return (
@@ -468,137 +490,419 @@ setMyReview(
 
         {/* HERO */}
 
+        {/* ================= HERO ================= */}
+
+<div
+  className="
+  relative
+  h-[420px]
+  md:h-[600px]
+  rounded-[32px]
+  overflow-hidden
+  shadow-2xl
+  "
+>
+
+  {/* Background Image */}
+
+  <img
+    src={`${BASE_URL}/uploads/${tour.image}`}
+    alt={tour.title}
+    className="
+    w-full
+    h-full
+    object-cover
+    "
+  />
+
+  {/* Dark Overlay */}
+
+  <div
+    className="
+    absolute
+    inset-0
+    bg-gradient-to-t
+    from-black/90
+    via-black/30
+    to-transparent
+    "
+  />
+
+  {/* Status Badge */}
+
+  <div
+    className="
+    absolute
+    top-6
+    left-6
+    "
+  >
+
+    {/* <span
+      className={`
+      px-5
+      py-2
+      rounded-full
+      text-sm
+      font-semibold
+      text-white
+      shadow-lg
+
+      ${
+        tour.status === "ACTIVE"
+          ? "bg-green-500"
+          : tour.status === "FULL"
+          ? "bg-red-500"
+          : "bg-gray-600"
+      }
+      `}
+    >
+
+      {tour.status}
+
+    </span> */}
+
+  </div>
+
+  {/* Hero Content */}
+
+  <div
+    className="
+    absolute
+    bottom-8
+    left-8
+    right-8
+    text-white
+    "
+  >
+
+    {/* Rating */}
+
+    <div
+      className="
+      flex
+      items-center
+      gap-3
+      mb-5
+      "
+    >
+
+      <div
+        className="
+        flex
+        items-center
+        gap-1
+        "
+      >
+
+        <Star
+          size={20}
+          className="
+          text-yellow-400
+          fill-yellow-400
+          "
+        />
+
+        <span className="font-semibold">
+
+          {ratingInfo.average_rating || 0}
+
+        </span>
+
+      </div>
+
+      <span className="text-white/80">
+
+        ({ratingInfo.total_reviews || 0} Reviews)
+
+      </span>
+
+    </div>
+
+    {/* Title */}
+
+    <h1
+      className="
+      text-4xl
+      md:text-6xl
+      font-extrabold
+      leading-tight
+      drop-shadow-lg
+      "
+    >
+
+      {tour.title}
+
+    </h1>
+
+    {/* Information Cards */}
+
+    <div
+      className="
+      flex
+      flex-wrap
+      gap-4
+      mt-8
+      "
+    >
+
+      {/* Location */}
+
+      <div
+        className="
+        bg-white/15
+        backdrop-blur-md
+        rounded-2xl
+        px-5
+        py-3
+        flex
+        items-center
+        gap-3
+        "
+      >
+
+        <MapPin size={22} />
+
+        <div>
+
+          <p className="text-xs text-white/70">
+
+            Destination
+
+          </p>
+
+          <p className="font-semibold">
+
+            {tour.location}
+
+          </p>
+
+        </div>
+
+      </div>
+
+      {/* Schedule */}
+
+      <div
+        className="
+        bg-white/15
+        backdrop-blur-md
+        rounded-2xl
+        px-5
+        py-3
+        flex
+        items-center
+        gap-3
+        "
+      >
+
+        <CalendarDays size={22} />
+
+        <div>
+
+          <p className="text-xs text-white/70">
+
+            Tour Schedule
+
+          </p>
+
+          <p className="font-semibold">
+
+            {formatDate(tour.available_from)}
+
+            {"  →  "}
+
+            {formatDate(tour.available_until)}
+
+          </p>
+
+        </div>
+
+      </div>
+
+      {/* Duration */}
+
+      <div
+        className="
+        bg-white/15
+        backdrop-blur-md
+        rounded-2xl
+        px-5
+        py-3
+        flex
+        items-center
+        gap-3
+        "
+      >
+
+        <Clock3 size={22} />
+
+        <div>
+
+          <p className="text-xs text-white/70">
+
+            Duration
+
+          </p>
+
+          <p className="font-semibold">
+
+            {tour.duration}
+
+          </p>
+
+        </div>
+
+      </div>
+
+      {/* Remaining Seats */}
+
+      <div
+        className="
+        bg-white/15
+        backdrop-blur-md
+        rounded-2xl
+        px-5
+        py-3
+        min-w-[250px]
+        "
+      >
+
         <div
           className="
-          relative
-          h-[350px]
-          md:h-[550px]
-          rounded-3xl
-          overflow-hidden
-          shadow-2xl
+          flex
+          justify-between
+          items-center
           "
         >
 
-          <img
-            src={`${BASE_URL}/uploads/${tour.image}`}
-            alt={tour.title}
-            className="
-            w-full
-            h-full
-            object-cover
-            "
-          />
+          <div className="flex items-center gap-2">
 
-          <div
-            className="
-            absolute
-            inset-0
-            bg-gradient-to-t
-            from-black/80
-            via-black/20
-            to-transparent
-            "
-          />
+            <Users size={20} />
 
-          <div
-            className="
-            absolute
-            bottom-8
-            left-8
-            text-white
-            "
-          >
+            <span className="font-semibold">
 
-            <h1
-              className="
-              text-4xl
-              md:text-6xl
-              font-bold
-              "
-            >
-              {tour.title}
-            </h1>
+              Seats Remaining
 
-            <div
-              className="
-              flex
-              flex-wrap
-              gap-5
-              mt-4
-              "
-            >
-
-              <span className="flex items-center gap-2">
-                <FaMapMarkerAlt />
-                {tour.location}
-              </span>
-
-              <span className="flex items-center gap-2">
-                <FaClock />
-                {tour.duration} Days
-              </span>
-
-              <span className="flex items-center gap-2">
-                <FaStar />
-                {ratingInfo.average_rating || 0}
-                Rating
-
-              </span>
-
-            </div>
+            </span>
 
           </div>
 
+          <span>
+
+            {tour.remaining_seats}
+
+            /
+
+            {tour.max_people}
+
+          </span>
+
         </div>
+
+        <div
+          className="
+          w-full
+          h-2
+          bg-white/20
+          rounded-full
+          mt-3
+          "
+        >
+
+          <div
+            className="
+            h-2
+            rounded-full
+            bg-green-400
+            transition-all
+            duration-500
+            "
+            style={{
+              width: `${seatPercentage}%`,
+            }}
+          />
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+            {/* ================= PHOTO GALLERY ================= */}
+
+{gallery.length > 0 && (
+
+<div className="mt-8">
+
+    <div className="flex justify-between items-center mb-5">
+
+        <div>
+
+            <h2 className="text-2xl font-bold">
+
+                Tour Gallery
+
+            </h2>
+
+            <p className="text-slate-500">
+
+                Explore more beautiful views from this destination.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+        {gallery.slice(0,4).map((photo,index)=>(
+
+            <div
+                key={photo.gallery_id}
+                className="
+                group
+                overflow-hidden
+                rounded-3xl
+                shadow-lg
+                cursor-pointer
+                "
+            >
+
+                <img
+                    src={`${BASE_URL}/uploads/gallery/${photo.image}`}
+                    alt=""
+                    className="
+                    w-full
+                    h-56
+                    object-cover
+                    transition-transform
+                    duration-500
+                    group-hover:scale-110
+                    "
+                />
+
+            </div>
+
+        ))}
+
+    </div>
+
+</div>
+
+)}
 
         {/* QUICK STATS */}
 
         <div
           className="
-          grid
-          grid-cols-2
-          md:grid-cols-4
-          gap-5
           my-10
           "
         >
-
-          <div className="bg-white rounded-2xl p-5 shadow text-center">
-            <h3 className="text-3xl font-bold">
-              20+
-            </h3>
-            <p className="text-slate-500">
-              Travelers
-            </p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 shadow text-center">
-            <h3 className="text-3xl font-bold">
-              {ratingInfo.average_rating || 0}
-            </h3>
-            <p className="text-slate-500">
-              Rating
-            </p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 shadow text-center">
-            <h3 className="text-xl font-bold">
-              {tour.location}
-            </h3>
-            <p className="text-slate-500">
-              Destination
-            </p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 shadow text-center">
-            <h3 className="text-3xl font-bold">
-              {tour.duration}
-            </h3>
-            <p className="text-slate-500">
-              Days
-            </p>
-          </div>
-
         </div>
 
         {/* CONTENT */}
@@ -640,110 +944,88 @@ setMyReview(
               </p>
 
             </div>
-            {/* ================= TOUR INFORMATION ================= */}
+            <section className="bg-white rounded-3xl shadow p-8 mt-8">
 
-                <div className="mt-10 bg-white rounded-3xl shadow-lg p-8">
+              <h2 className="text-2xl font-bold mb-8">
 
-                  <h2 className="text-2xl font-bold mb-8">
-                    Tour Information
-                  </h2>
+                  Tour Itinerary
 
-                  <div className="grid md:grid-cols-2 gap-6">
+              </h2>
 
-                    <div className="flex items-center gap-4">
+              <div className="space-y-8">
 
-                      <MapPin className="text-sky-500"/>
+                  {itineraryItems.map((item,index)=>{
 
-                      <div>
+                      const [time,activity]=item.split(" - ");
 
-                        <p className="text-sm text-gray-500">
-                          Meeting Point
-                        </p>
+                      return(
 
-                        <p className="font-semibold">
-                          WanderEscape Office 
-                        </p>
+                          <div
+                              key={index}
+                              className="flex gap-5"
+                          >
 
-                      </div>
+                              {/* Circle */}
 
-                    </div>
+                              <div
+                                  className="
+                                  flex
+                                  flex-col
+                                  items-center
+                                  "
+                              >
 
-                    <div className="flex items-center gap-4">
+                                  <div
+                                      className="
+                                      w-5
+                                      h-5
+                                      rounded-full
+                                      bg-gray-400
+                                      "
+                                  />
 
-                      <Clock3 className="text-orange-500"/>
+                                  {index !== itineraryItems.length-1 && (
 
-                      <div>
+                                      <div
+                                          className="
+                                          w-[2px]
+                                          flex-1
+                                          bg-orange-200
+                                          mt-1
+                                          "
+                                      />
 
-                        <p className="text-sm text-gray-500">
-                          Departure Time
-                        </p>
+                                  )}
 
-                        <p className="font-semibold">
-                          07:30 AM
-                        </p>
+                              </div>
 
-                      </div>
+                              {/* Content */}
 
-                    </div>
+                              <div>
 
-                    <div className="flex items-center gap-4">
+                                  <p className="text-sky-900 font-bold">
 
-                      <Clock3 className="text-green-500"/>
+                                      {time}
 
-                      <div>
+                                  </p>
 
-                        <p className="text-sm text-gray-500">
-                          Return Time
-                        </p>
+                                  <h3 className="font-semibold text-lg">
 
-                        <p className="font-semibold">
-                          05:00 PM
-                        </p>
+                                      {activity}
 
-                      </div>
+                                  </h3>
 
-                    </div>
+                              </div>
 
-                    <div className="flex items-center gap-4">
+                          </div>
 
-                      <Users className="text-purple-500"/>
+                      );
 
-                      <div>
+                  })}
 
-                        <p className="text-sm text-gray-500">
-                          Group Size
-                        </p>
+              </div>
 
-                        <p className="font-semibold">
-                          Maximum 15 Travelers
-                        </p>
-
-                      </div>
-
-                    </div>
-
-                    <div className="flex items-center gap-4">
-
-                      <Languages className="text-pink-500"/>
-
-                      <div>
-
-                        <p className="text-sm text-gray-500">
-                          Tour Guide
-                        </p>
-
-                        <p className="font-semibold">
-                          English / Khmer
-                        </p>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                </div>
-            {/* ================= ACCOMMODATION ================= */}
+          </section>
 
               <div className="mt-10">
 
@@ -799,7 +1081,7 @@ setMyReview(
               </div>
             {/* HIGHLIGHTS */}
 
-            <div
+            {/* <div
               className="
               bg-white
               rounded-3xl
@@ -848,7 +1130,7 @@ setMyReview(
 
               </div>
 
-            </div>
+            </div> */}
 
             {/* INCLUDED */}
 

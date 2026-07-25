@@ -6,11 +6,47 @@ import {
   Clock3,
   DollarSign,
   ArrowRight,
-  Star,
+  CalendarDays,
+  Users,
+  CircleCheck,
 } from "lucide-react";
 
 const TourCard = ({ tour }) => {
   const navigate = useNavigate();
+
+  const formatDate = (date) =>
+    new Date(date).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+    });
+
+  const percentage =
+    tour.max_people > 0
+      ? (tour.remaining_seats / tour.max_people) * 100
+      : 0;
+  
+  const remainingPercentage =
+  (Number(tour.remaining_seats) / Number(tour.max_people)) * 100;
+
+    let seatColor = "";
+    let seatBg = "";
+    let seatText = "";
+
+    if (remainingPercentage > 70) {
+      seatColor = "bg-emerald-500";
+      seatBg = "text-emerald-600";
+      seatText = "Plenty Available";
+    }
+    else if (remainingPercentage > 30) {
+      seatColor = "bg-yellow-500";
+      seatBg = "text-yellow-600";
+      seatText = "Filling Fast";
+    }
+    else {
+      seatColor = "bg-red-500";
+      seatBg = "text-red-600";
+      seatText = "Almost Full";
+    }
 
   return (
     <div
@@ -26,19 +62,16 @@ const TourCard = ({ tour }) => {
       group
       "
     >
-      {/* Image */}
+      {/* IMAGE */}
       <div className="relative overflow-hidden">
 
         <img
-          onClick={() =>
-            navigate(`/tours/${tour.tour_id}`)
-          }
           src={`${BASE_URL}/uploads/${tour.image}`}
           alt={tour.title}
+          onClick={() => navigate(`/tours/${tour.tour_id}`)}
           className="
           w-full
           h-72
-          md:h-80
           object-cover
           cursor-pointer
           group-hover:scale-110
@@ -47,76 +80,33 @@ const TourCard = ({ tour }) => {
           "
         />
 
-        {/* Tour Badge
-        <div
-          className="
-          absolute
-          bottom-4
-          left-4
-          bg-orange-500
-          text-white
-          px-3
-          py-1
-          rounded-full
-          text-sm
-          font-medium
-          shadow
-          "
-        >
-          🔥 Popular
-        </div> */}
-
-        {/* Rating
+        {/* Status Badge */}
         <div
           className="
           absolute
           top-4
-          right-4
-          bg-white
-          px-3
-          py-1
+          left-4
+          bg-emerald-500
+          text-white
+          px-4
+          py-2
           rounded-full
-          shadow-md
           flex
           items-center
-          gap-1
+          gap-2
+          shadow-lg
+          text-sm
+          font-semibold
           "
         >
-          <Star
-            size={14}
-            className="text-yellow-500 fill-yellow-500"
-          />
-          <span className="text-sm font-semibold">
-            4.9
-          </span>
-        </div> */}
+          <CircleCheck size={16} />
+          Available
+        </div>
 
       </div>
 
-      {/* Content */}
+      {/* CONTENT */}
       <div className="p-6">
-
-        {/* Location + Duration */}
-        <div
-          className="
-          flex
-          justify-between
-          items-center
-          text-sm
-          text-slate-500
-          mb-4
-          "
-        >
-          <div className="flex items-center gap-1">
-            <MapPin size={16} />
-            <span>{tour.location}</span>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <Clock3 size={16} />
-            <span>{tour.duration} Days</span>
-          </div>
-        </div>
 
         {/* Title */}
         <h2
@@ -124,43 +114,180 @@ const TourCard = ({ tour }) => {
           text-2xl
           font-bold
           text-slate-900
-          mb-3
           line-clamp-1
           "
         >
           {tour.title}
         </h2>
 
-        {/* Description */}
+        {/* Location */}
+        <div className="flex items-center gap-2 text-slate-500 mt-2">
+
+          <MapPin size={17} />
+
+          <span>{tour.location}</span>
+
+        </div>
+
+        {/* Description
         <p
           className="
           text-slate-500
-          text-base
+          mt-4
           line-clamp-3
           min-h-[72px]
           "
         >
           {tour.description}
-        </p>
+        </p> */}
 
-        {/* Footer */}
+        {/* TOUR INFO */}
+        <div className="mt-5 space-y-3">
+
+          {/* Schedule */}
+          <div className="flex items-center gap-3 text-slate-600">
+
+            <CalendarDays
+              size={18}
+              className="text-sky-600"
+            />
+
+            <span>
+
+              {formatDate(tour.available_from)} -{" "}
+
+              {formatDate(tour.available_until)}
+
+            </span>
+
+          </div>
+
+          {/* Duration */}
+          <div className="flex items-center gap-3 text-slate-600">
+
+            <Clock3
+              size={18}
+              className="text-orange-500"
+            />
+
+            <span>{tour.duration}</span>
+
+          </div>
+
+          {/* Seats */}
+          <div className="flex items-center justify-between">
+
+  <div className="flex items-center gap-3">
+
+    <Users
+      size={18}
+      className={seatBg}
+    />
+
+    <span className="font-medium">
+
+      {tour.remaining_seats} / {tour.max_people}
+
+      {" "}Seats Remaining
+
+    </span>
+
+  </div>
+
+  <span
+  className={`
+    px-2.5
+    py-1
+    rounded-full
+    text-xs
+    font-semibold
+    whitespace-nowrap
+    ${
+      remainingPercentage > 70
+        ? "bg-emerald-100 text-emerald-700"
+        : remainingPercentage > 30
+        ? "bg-yellow-100 text-yellow-700"
+        : "bg-red-100 text-red-700"
+    }
+  `}
+>
+  {remainingPercentage > 70
+    ? "Available"
+    : remainingPercentage > 30
+    ? "Limited"
+    : "Almost Full"}
+</span>
+
+        </div>       
+
+          <div>
+
+            <div
+              className="
+              w-full
+              h-2
+              bg-slate-200
+              rounded-full
+              overflow-hidden
+              "
+            >
+              <div
+                className={`
+                    h-full
+                    ${seatColor}
+                    rounded-full
+                    transition-all
+                    duration-700
+                  `}
+                style={{
+                  width: `${percentage}%`,
+                }}
+              ></div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* FOOTER */}
+
         <div
           className="
-          flex
-          items-center
-          justify-between
-          mt-6
-          pt-5
-          border-t
-          border-slate-100
-          "
+                mt-7
+                pt-5
+                border-t
+
+                flex
+                flex-col
+                gap-5
+
+                sm:flex-row
+                sm:justify-between
+                sm:items-center
+              "
         >
 
           {/* Price */}
+
           <div>
 
-            <div className="flex items-center gap-1">
+            <p
+              className="
+              text-sm
+              text-slate-500
+              "
+            >
+              Starting From
+            </p>
 
+            <div
+              className="
+              flex
+              items-center
+              gap-1
+              "
+            >
               <DollarSign
                 size={20}
                 className="text-emerald-600"
@@ -178,44 +305,50 @@ const TourCard = ({ tour }) => {
 
             </div>
 
-            <p
-              className="
-              text-sm
-              text-slate-500
-              "
-            >
-              per person
+            <p className="text-sm text-slate-500">
+
+              Per Person
+
             </p>
 
           </div>
 
           {/* Button */}
+
           <button
             onClick={() =>
               navigate(`/tours/${tour.tour_id}`)
             }
             className="
-            flex
-            items-center
-            gap-2
-            bg-orange-500
-            hover:bg-orange-600
-            text-white
-            px-6
-            py-3
-            rounded-xl
-            font-semibold
-            transition
-            shadow-md
-            "
+                w-full
+                sm:w-auto
+                bg-orange-500
+                hover:bg-orange-600
+                text-white
+                px-6
+                py-3
+                rounded-xl
+                flex
+                justify-center
+                items-center
+                gap-2
+                font-semibold
+                shadow-md
+                transition
+                cursor-pointer
+                "
           >
-            Book Now
+
+            View Details
+
             <ArrowRight size={18} />
+
           </button>
 
         </div>
 
       </div>
+
     </div>
   );
 };

@@ -2,17 +2,21 @@ import { useState } from "react";
 import API, { BASE_URL } from "../services/api";
 import PaymentModal from "../components/PaymentModal";
 import toast from "react-hot-toast";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const BookingForm = ({ tour, onClose }) => {
-
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const [preparingPayment, setPreparingPayment] =
+  useState(false);
   const [loading, setLoading] =
     useState(false);
 
   const [showPayment, setShowPayment] =
     useState(false);
 
-  const [bookingId] =
-    useState(null);
+  const [bookingId, setBookingId] =
+  useState(null);
 
   const [errors, setErrors] =
     useState({});
@@ -22,7 +26,8 @@ const BookingForm = ({ tour, onClose }) => {
 
   const [pendingBooking, setPendingBooking] =useState(null);
 
-
+  const { user } = useContext(AuthContext);
+  
   const [form, setForm] = useState({
     full_name: "",
     email: "",
@@ -31,6 +36,25 @@ const BookingForm = ({ tour, onClose }) => {
     people_count: 1,
     special_requests: "",
   });
+  useEffect(() => {
+
+  if (user && tour) {
+
+    setForm((prev) => ({
+
+      ...prev,
+
+      full_name: user.name,
+
+      email: user.email,
+
+      travel_date:tour.available_from
+
+    }));
+
+  }
+
+}, [user, tour]);
 
   // ✅ TOTAL PRICE
   
@@ -38,16 +62,6 @@ const BookingForm = ({ tour, onClose }) => {
     Number(tour.price) *
     Number(form.people_count);
 
-  const tomorrow = new Date();
-
-tomorrow.setDate(
-  tomorrow.getDate() + 1
-);
-
-const minDate =
-  tomorrow
-    .toISOString()
-    .split("T")[0];
   const EXCHANGE_RATE = 4100;
 
   const totalPriceKHR =
@@ -75,49 +89,25 @@ const minDate =
   // ✅ VALIDATION
   const validate = () => {
 
-    const newErrors = {};
+  const newErrors = {};
 
-    if (!form.full_name.trim()) {
-      newErrors.full_name =
-        "Full name is required";
-    }
+  if (!form.full_name.trim()) {
+    newErrors.full_name = "Full name is required";
+  }
 
-    if (!form.email.trim()) {
-      newErrors.email =
-        "Email is required";
-    }
-    if (!form.phone.trim()) {
-      newErrors.phone =
-        "Phone Number is required";
-    }
+  if (!form.email.trim()) {
+    newErrors.email = "Email is required";
+  }
 
-    if (!form.travel_date) {
-      newErrors.travel_date =
-        "Travel date is required";
-    }
-    const selectedDate =
-      new Date(form.travel_date);
+  if (!form.phone.trim()) {
+    newErrors.phone = "Phone Number is required";
+  }
 
-    const tomorrow =
-      new Date();
+  setErrors(newErrors);
 
-    tomorrow.setHours(0, 0, 0, 0);
+  return Object.keys(newErrors).length === 0;
 
-    tomorrow.setDate(
-      tomorrow.getDate() + 1
-    );
-
-    if (selectedDate < tomorrow) {
-      newErrors.travel_date =
-        "Travel date must be from tomorrow onwards.";
-    }
-    setErrors(newErrors);
-
-    return (
-      Object.keys(newErrors).length === 0
-    );
-
-  };
+};
 
   // ✅ CREATE BOOKING
   // const handleSubmit =
@@ -206,11 +196,18 @@ const minDate =
 
   };
 
-  setPendingBooking(
-    bookingData
-  );
+ setPreparingPayment(true);
 
-  setShowPayment(true);
+setPendingBooking(bookingData);
+
+// Fake loading for better UX
+await new Promise((resolve) =>
+  setTimeout(resolve, 1800)
+);
+
+setPreparingPayment(false);
+
+setShowPayment(true);
 
 };
 
@@ -243,6 +240,12 @@ const minDate =
 
     try {
 
+      setProcessingPayment(true);
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, 2200)
+      );
+
       setLoading(true);
 
       const res =
@@ -272,10 +275,12 @@ const minDate =
     );
 
     setShowPayment(false);
-
+    setProcessingPayment(false);
     setShowSuccess(true);
 
     } catch(error){
+
+      setProcessingPayment(false);
 
       console.error(error);
 
@@ -331,22 +336,18 @@ const minDate =
         >
 
           <InputField
-            label="Full Name *"
+            label="Full Name"
             name="full_name"
             value={form.full_name}
-            onChange={handleChange}
-            placeholder="Your full name"
-            error={errors.full_name}
+            readOnly
           />
 
           <InputField
-            label="Email *"
+            label="Email"
             type="email"
             name="email"
             value={form.email}
-            onChange={handleChange}
-            placeholder="you@email.com"
-            error={errors.email}
+            readOnly
           />
 
           <InputField
@@ -358,15 +359,6 @@ const minDate =
             error={errors.phone}
           />
 
-          <InputField
-            label="Travel Date *"
-            type="date"
-            name="travel_date"
-            value={form.travel_date}
-            onChange={handleChange}
-            min={minDate}
-            error={errors.travel_date}
-          />
 
           {/* TRAVELERS */}
           <div>
@@ -382,7 +374,7 @@ const minDate =
               className="w-full mt-2 border rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
             >
 
-              {[1,2,3,4,5].map((n) => (
+              {[1,2,3,4,5,6,7,8].map((n) => (
                 <option
                   key={n}
                   value={n}
@@ -429,11 +421,40 @@ const minDate =
               <span>Travelers</span>
               <span>x {form.people_count}</span>
             </div>
+            
             <div className="flex justify-between mb-2">
               <span>Durations</span>
               <span>{tour.duration} day</span>
             </div>
+            <div
+          className="
+          flex justify-between mb-2
+          "
+        >
 
+          <span>
+
+            Tour Departure Date
+
+          </span>
+
+          <h3 className="text-lg font-bold text-sky-700">
+
+            {
+              new Date(tour.available_from).toLocaleDateString(
+                "en-GB",
+                {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                    timeZone: "Asia/Phnom_Penh",
+                }
+            )
+             }
+
+          </h3>
+
+        </div>
             <hr className="my-3" />
 
             <div className="flex justify-between text-xl font-bold">
@@ -483,6 +504,67 @@ const minDate =
                 : "Confirm Booking →"}
 
             </button>
+            {processingPayment && (
+
+                <div className="
+                fixed
+                inset-0
+                z-[999]
+                bg-black/70
+                backdrop-blur-sm
+                flex
+                items-center
+                justify-center
+                ">
+
+                <div className="
+                bg-white
+                rounded-3xl
+                w-[380px]
+                p-10
+                text-center
+                ">
+
+                <div
+                className="
+                w-16
+                h-16
+                mx-auto
+                rounded-full
+                border-[6px]
+                border-sky-200
+                border-t-sky-500
+                animate-spin
+                "
+                />
+
+                <h2 className="mt-8 text-2xl font-bold">
+
+                Verifying Payment
+
+                </h2>
+
+                <p className="mt-3 text-slate-500">
+
+                Please wait while we verify your payment and reserve your seat.
+
+                </p>
+
+                <div className="mt-6">
+
+                <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+
+                <div className="h-full bg-sky-500 animate-pulse w-full"/>
+
+                </div>
+
+                </div>
+
+                </div>
+
+                </div>
+
+                )}
             {
               showSuccess && (
 
@@ -545,9 +627,16 @@ const minDate =
                     </p>
 
                     <p>
-                      <strong>Date:</strong>
-                      {" "}
-                      {form.travel_date}
+                      <strong>Date:</strong>{" "}
+                      {new Date(form.travel_date).toLocaleDateString(
+                        "en-GB",
+                        {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                          timeZone: "Asia/Phnom_Penh",
+                        }
+                      )}
                     </p>
 
                     <p>
@@ -624,7 +713,75 @@ const minDate =
         </form>
 
       </div>
+      {preparingPayment && (
 
+          <div
+          className="
+          fixed
+          inset-0
+          z-[999]
+          bg-black/70
+          backdrop-blur-sm
+          flex
+          items-center
+          justify-center
+          "
+          >
+
+          <div
+          className="
+          bg-white
+          rounded-3xl
+          w-[400px]
+          p-10
+          text-center
+          "
+          >
+
+          <div
+          className="
+          w-16
+          h-16
+          mx-auto
+          rounded-full
+          border-[6px]
+          border-orange-200
+          border-t-orange-500
+          animate-spin
+          "
+          />
+
+          <h2
+          className="
+          text-2xl
+          font-bold
+          mt-8
+          "
+          >
+
+          Preparing Payment
+
+          </h2>
+
+          <p
+          className="
+          mt-3
+          text-slate-500
+          leading-7
+          "
+          >
+
+          Calculating your booking,
+          checking seat availability,
+          and generating your secure KHQR payment.
+
+          </p>
+
+          </div>
+
+          </div>
+
+          )}
       {/* PAYMENT MODAL */}
       {showPayment && (
 
