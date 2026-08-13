@@ -5,6 +5,8 @@ import TourDetails from "../pages/ToursDetails";
 import Tours from "../pages/Tours";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import ForgotPassword from "../pages/ForgotPassword";
+
 
 import TicketPage from "../pages/Ticket";
 import Destinations from "../pages/Destinations";
@@ -29,6 +31,7 @@ const AppRoutes = () => {
           <Route path="/tours/:id" element={<TourDetails />} />
           <Route path="/login" element={<Login/>} />
           <Route path="/register" element={<Register/>} />
+          <Route path="/forgot-password"element={<ForgotPassword />}/>
           <Route path="/ticket/:id"element={<TicketPage/>}/>
           <Route path="/destinations" element={<Destinations/>}/>
           <Route path="/travel-guides"element={<TravelGuides/>}/>

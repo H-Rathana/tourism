@@ -6,7 +6,12 @@ import {
 
 import { AuthContext } from "../context/AuthContext";
 import API from "../services/api";
-import { Camera } from "lucide-react";
+import {
+   Camera,
+   Eye,
+  EyeOff,
+  LockKeyhole,
+   } from "lucide-react";
 import toast from "react-hot-toast";
 
 const EditProfile = () => {
@@ -24,6 +29,28 @@ useState(null);
 
 const [saving, setSaving] =
 useState(false);
+
+const [activeTab, setActiveTab] =
+  useState("info");
+
+const [changingPassword, setChangingPassword] =
+  useState(false);
+
+const [passwordForm, setPasswordForm] =
+  useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+const [showCurrentPassword, setShowCurrentPassword] =
+  useState(false);
+
+const [showNewPassword, setShowNewPassword] =
+  useState(false);
+
+const [showConfirmPassword, setShowConfirmPassword] =
+  useState(false);
 
 const [formData, setFormData] =
 useState({
@@ -94,7 +121,17 @@ const handleChange =
   });
 
 };
+const handlePasswordChange = (e) => {
+  const {
+    name,
+    value,
+  } = e.target;
 
+  setPasswordForm((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
 
 const handleImageChange =
 (e) => {
@@ -187,7 +224,86 @@ updateUser(newUser);
 
   }
 };
+const handleChangePassword = async (e) => {
 
+  e.preventDefault();
+
+  const {
+    currentPassword,
+    newPassword,
+    confirmPassword,
+  } = passwordForm;
+
+  if (!currentPassword) {
+    toast.error(
+      "Please enter your current password"
+    );
+    return;
+  }
+
+  if (!newPassword) {
+    toast.error(
+      "Please enter a new password"
+    );
+    return;
+  }
+
+  if (newPassword.length < 8) {
+    toast.error(
+      "New password must be at least 8 characters"
+    );
+    return;
+  }
+
+  if (!confirmPassword) {
+    toast.error(
+      "Please confirm your new password"
+    );
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    toast.error(
+      "New passwords do not match"
+    );
+    return;
+  }
+
+  try {
+
+    setChangingPassword(true);
+
+    await API.patch(
+      "/users/change-password",
+      passwordForm
+    );
+
+    toast.success(
+      "Password changed successfully!"
+    );
+
+    // Clear form after success
+    setPasswordForm({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+
+  } catch (error) {
+
+  console.error(error);
+
+  toast.error(
+    error.response?.data?.message ||
+    "Failed to change password"
+  );
+
+  } finally {
+
+    setChangingPassword(false);
+
+  }
+};
 
 return (
 
@@ -343,18 +459,67 @@ return (
         )} */}
 
       </div>
+      {/* SETTINGS TABS */}
+<div className="
+  mt-8
+  bg-slate-100
+  p-1.5
+  rounded-2xl
+  flex
+  gap-1
+">
+
+  <button
+    type="button"
+    onClick={() => setActiveTab("info")}
+    className={`
+      flex-1
+      py-3
+      rounded-xl
+      font-semibold
+      transition
+      ${
+        activeTab === "info"
+          ? "bg-white text-sky-600 shadow-sm"
+          : "text-slate-500 hover:text-slate-700"
+      }
+    `}
+  >
+    Edit Information
+  </button>
+
+  <button
+    type="button"
+    onClick={() =>
+      setActiveTab("password")
+    }
+    className={`
+      flex-1
+      py-3
+      rounded-xl
+      font-semibold
+      transition
+      ${
+        activeTab === "password"
+          ? "bg-white text-sky-600 shadow-sm"
+          : "text-slate-500 hover:text-slate-700"
+      }
+    `}
+  >
+    Change Password
+  </button>
+
+</div>
 
       {/* Form */}
-
-      <form
-        onSubmit={
-          handleSubmit
-        }
-        className="
-        mt-10
-        space-y-6
-        "
-      >
+{activeTab === "info" && (
+  <form
+    onSubmit={handleSubmit}
+    className="
+      mt-10
+      space-y-6
+    "
+  >
 
         <div>
 
@@ -489,7 +654,300 @@ return (
         </button>
 
       </form>
+)}
+       {/* CHANGE PASSWORD */}
+{activeTab === "password" && (
+<div className="mt-10">
 
+  {/* HEADER */}
+  <div className="flex items-center gap-4 mb-6">
+
+    <div className="
+      w-12
+      h-12
+      rounded-xl
+      bg-sky-100
+      text-sky-600
+      flex
+      items-center
+      justify-center
+    ">
+      <LockKeyhole size={22} />
+    </div>
+
+    <div>
+
+      <h2 className="
+        text-2xl
+        font-bold
+        text-slate-800
+      ">
+        Change Password
+      </h2>
+
+      <p className="
+        text-sm
+        text-slate-500
+        mt-1
+      ">
+        Update your password to keep your
+        account secure.
+      </p>
+
+    </div>
+
+  </div>
+
+  {/* PASSWORD FORM */}
+  <form
+    onSubmit={handleChangePassword}
+    className="space-y-6"
+  >
+
+    {/* CURRENT PASSWORD */}
+    <div>
+
+      <label className="
+        font-medium
+        block
+        mb-2
+      ">
+        Current Password
+      </label>
+
+      <div className="relative">
+
+        <input
+          type={
+            showCurrentPassword
+              ? "text"
+              : "password"
+          }
+          name="currentPassword"
+          value={
+            passwordForm.currentPassword
+          }
+          onChange={
+            handlePasswordChange
+          }
+          placeholder="Enter current password"
+          disabled={changingPassword}
+          className="
+            w-full
+            border
+            border-slate-300
+            rounded-xl
+            p-3
+            pr-12
+            focus:outline-none
+            focus:ring-2
+            focus:ring-sky-500
+            focus:border-sky-500
+            transition
+          "
+        />
+
+        <button
+          type="button"
+          onClick={() =>
+            setShowCurrentPassword(
+              !showCurrentPassword
+            )
+          }
+          className="
+            absolute
+            right-4
+            top-1/2
+            -translate-y-1/2
+            text-slate-400
+            hover:text-slate-600
+          "
+        >
+          {showCurrentPassword ? (
+            <Eye size={20} />
+          ) : (
+            <EyeOff size={20} />
+          )}
+        </button>
+
+      </div>
+
+    </div>
+
+    {/* NEW PASSWORD */}
+    <div>
+
+      <label className="
+        font-medium
+        block
+        mb-2
+      ">
+        New Password
+      </label>
+
+      <div className="relative">
+
+        <input
+          type={
+            showNewPassword
+              ? "text"
+              : "password"
+          }
+          name="newPassword"
+          value={
+            passwordForm.newPassword
+          }
+          onChange={
+            handlePasswordChange
+          }
+          placeholder="Enter new password"
+          disabled={changingPassword}
+          className="
+            w-full
+            border
+            border-slate-300
+            rounded-xl
+            p-3
+            pr-12
+            focus:outline-none
+            focus:ring-2
+            focus:ring-sky-500
+            focus:border-sky-500
+            transition
+          "
+        />
+
+        <button
+          type="button"
+          onClick={() =>
+            setShowNewPassword(
+              !showNewPassword
+            )
+          }
+          className="
+            absolute
+            right-4
+            top-1/2
+            -translate-y-1/2
+            text-slate-400
+            hover:text-slate-600
+          "
+        >
+          {showNewPassword ? (
+            <Eye size={20} />
+          ) : (
+            <EyeOff size={20} />
+          )}
+        </button>
+
+      </div>
+
+      <p className="
+        text-xs
+        text-slate-400
+        mt-2
+      ">
+        Password must be at least 8 characters.
+      </p>
+
+    </div>
+
+    {/* CONFIRM PASSWORD */}
+    <div>
+
+      <label className="
+        font-medium
+        block
+        mb-2
+      ">
+        Confirm New Password
+      </label>
+
+      <div className="relative">
+
+        <input
+          type={
+            showConfirmPassword
+              ? "text"
+              : "password"
+          }
+          name="confirmPassword"
+          value={
+            passwordForm.confirmPassword
+          }
+          onChange={
+            handlePasswordChange
+          }
+          placeholder="Confirm new password"
+          disabled={changingPassword}
+          className="
+            w-full
+            border
+            border-slate-300
+            rounded-xl
+            p-3
+            pr-12
+            focus:outline-none
+            focus:ring-2
+            focus:ring-sky-500
+            focus:border-sky-500
+            transition
+          "
+        />
+
+        <button
+          type="button"
+          onClick={() =>
+            setShowConfirmPassword(
+              !showConfirmPassword
+            )
+          }
+          className="
+            absolute
+            right-4
+            top-1/2
+            -translate-y-1/2
+            text-slate-400
+            hover:text-slate-600
+          "
+        >
+          {showConfirmPassword ? (
+            <Eye size={20} />
+          ) : (
+            <EyeOff size={20} />
+          )}
+        </button>
+
+      </div>
+
+    </div>
+
+    {/* BUTTON */}
+    <button
+      type="submit"
+      disabled={changingPassword}
+      className="
+        w-full
+        py-4
+        rounded-2xl
+        bg-slate-800
+        text-white
+        font-bold
+        hover:bg-slate-900
+        transition
+        disabled:opacity-50
+        disabled:cursor-not-allowed
+      "
+    >
+      {changingPassword
+        ? "Changing Password..."
+        : "Change Password"}
+    </button>
+
+  </form>
+
+</div>
+)}    
     </div>
 
   </div>

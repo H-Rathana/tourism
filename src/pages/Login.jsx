@@ -123,7 +123,16 @@ navigate(
 
         </form>
 
-        <p className="text-sm mt-4 opacity-80 cursor-pointer">
+        <p onClick={() => navigate("/forgot-password")}
+  className="
+    text-sm
+    mt-4
+    opacity-80
+    cursor-pointer
+    hover:opacity-100
+    hover:underline
+    transition
+  ">
           Forgot Password?
         </p>
 

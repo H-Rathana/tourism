@@ -277,7 +277,7 @@ const HeroSlider = () => {
 
           <p className="text-slate-300">
 
-          Travelers
+          Users
 
           </p>
 

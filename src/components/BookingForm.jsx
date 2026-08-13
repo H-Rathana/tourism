@@ -36,28 +36,67 @@ const BookingForm = ({ tour, onClose }) => {
     people_count: 1,
     special_requests: "",
   });
+//   useEffect(() => {
+
+//   if (user && tour) {
+
+//     setForm((prev) => ({
+
+//       ...prev,
+
+//       full_name: user.name,
+
+//       email: user.email,
+
+//       travel_date:tour.available_from
+
+//     }));
+
+//   }
+
+// }, [user, tour]);
+
+  // ✅ TOTAL PRICE
   useEffect(() => {
 
-  if (user && tour) {
+  if (!user || !tour) return;
 
-    setForm((prev) => ({
+  const availableSeats =
+    Number(tour.remaining_seats) || 0;
 
+  setForm((prev) => {
+
+    let peopleCount =
+      Number(prev.people_count) || 1;
+
+    // Tour is full
+    if (availableSeats === 0) {
+      peopleCount = 0;
+    }
+
+    // Selected travelers exceed available seats
+    else if (peopleCount > availableSeats) {
+      peopleCount = availableSeats;
+    }
+
+    // Make sure at least 1 traveler
+    else if (peopleCount < 1) {
+      peopleCount = 1;
+    }
+
+    return {
       ...prev,
 
       full_name: user.name,
-
       email: user.email,
+      travel_date: tour.available_from,
 
-      travel_date:tour.available_from
+      people_count: peopleCount,
+    };
 
-    }));
-
-  }
+  });
 
 }, [user, tour]);
-
-  // ✅ TOTAL PRICE
-  
   const totalPrice =
     Number(tour.price) *
     Number(form.people_count);
@@ -102,84 +141,36 @@ const BookingForm = ({ tour, onClose }) => {
   if (!form.phone.trim()) {
     newErrors.phone = "Phone Number is required";
   }
+  const availableSeats =
+  Number(tour?.remaining_seats) || 0;
 
+const travelers =
+  Number(form.people_count) || 0;
+
+if (availableSeats <= 0) {
+  newErrors.people_count =
+    "This tour is fully booked.";
+}
+
+else if (travelers > availableSeats) {
+  newErrors.people_count =
+    `Only ${availableSeats} ${
+      availableSeats === 1
+        ? "seat"
+        : "seats"
+    } remaining.`;
+}
+
+else if (travelers < 1) {
+  newErrors.people_count =
+    "Please select at least 1 traveler.";
+}
   setErrors(newErrors);
 
   return Object.keys(newErrors).length === 0;
 
 };
 
-  // ✅ CREATE BOOKING
-  // const handleSubmit =
-  //   async (e) => {
-
-  //     e.preventDefault();
-
-  //     if (!validate()) return;
-
-  //     try {
-
-  //       setLoading(true);
-
-  //       const bookingData = {
-
-  //         ...form,
-
-  //         tour_id:
-  //           tour.tour_id,
-
-  //         total_price:
-  //           totalPrice,
-
-  //       };
-
-  //       const res =
-  //         await API.post(
-  //           "/bookings",
-  //           bookingData
-  //         );
-
-  //       console.log(
-  //         "BOOKING RESPONSE:",
-  //         res.data
-  //       );
-
-  //       const booking =
-  //         res.data.booking;
-
-  //       // ✅ EXISTING BOOKING
-  //       if (res.data.existing) {
-
-  //         toast (
-  //           "You already have a pending booking for this tour."
-  //         );
-
-  //       }
-
-  //       // ✅ SAVE BOOKING ID
-  //       setBookingId(
-  //         booking.booking_id
-  //       );
-
-  //       // ✅ OPEN PAYMENT MODAL
-  //       setShowPayment(true);
-
-  //     } catch (error) {
-
-  //       console.error(error);
-
-  //       alert(
-  //         error.response?.data?.message ||
-  //         "Booking failed"
-  //       );
-
-  //     } finally {
-
-  //       setLoading(false);
-
-  //     }
-
-  //   };
   const handleSubmit = async (e) => {
 
   e.preventDefault();
@@ -211,30 +202,6 @@ setShowPayment(true);
 
 };
 
-  // ✅ USER CLICKED PAID
-  // const handlePaid =
-  //   async () => {
-
-  //     try {
-
-  //       toast.success(
-  //         "Payment submitted successfully"
-  //       );
-  //       toast.success(
-  //         "We are processing your ticket.It will arrive in your notification soon"
-  //       );
-
-  //       setShowPayment(false);
-
-  //       onClose();
-
-  //     } catch (error) {
-
-  //       console.error(error);
-
-  //     }
-
-  //   };
   const handlePaid =
   async () => {
 
@@ -371,10 +338,16 @@ setShowPayment(true);
               name="people_count"
               value={form.people_count}
               onChange={handleChange}
-              className="w-full mt-2 border rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
+              disabled={Number(tour.remaining_seats) <= 0}
+              className="w-full mt-2 border rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-sky-400 disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
 
-              {[1,2,3,4,5,6,7,8].map((n) => (
+              {Array.from(
+                {
+                  length: Number(tour.remaining_seats) || 0,
+                },
+                (_, index) => index + 1
+              ).map((n) => (
                 <option
                   key={n}
                   value={n}
@@ -384,6 +357,25 @@ setShowPayment(true);
               ))}
 
             </select>
+
+            {/* AVAILABLE SEATS */}
+            <p className="mt-2 text-sm text-gray-500">
+              {Number(tour.remaining_seats) > 0 ? (
+                <>
+                  <span className="font-medium text-green-600">
+                    {tour.remaining_seats}
+                  </span>{" "}
+                  {Number(tour.remaining_seats) === 1
+                    ? "seat"
+                    : "seats"}{" "}
+                  remaining
+                </>
+              ) : (
+                <span className="font-medium text-red-500">
+                  This tour is fully booked.
+                </span>
+              )}
+            </p>
 
           </div>
 
